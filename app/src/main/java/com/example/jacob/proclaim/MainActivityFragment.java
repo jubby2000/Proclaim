@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivityFragment extends Fragment {
-//    // TODO: Rename parameter arguments, choose names that match
-//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-//
-//    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+
+
     private AToZAdapter mAdapter;
 
     private OnFragmentInteractionListener mListener;
@@ -74,11 +70,15 @@ public class MainActivityFragment extends Fragment {
         final List<AToZList> aToZ = Arrays.asList(A, B);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.topic_list);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
+
         mAdapter = new AToZAdapter(getContext(), aToZ);
         mAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
             @Override
             public void onListItemExpanded(int position) {
                 AToZList expandedList = aToZ.get(position);
+
+                Log.v(LOG_TAG, String.valueOf(expandedList));
             }
 
             @Override

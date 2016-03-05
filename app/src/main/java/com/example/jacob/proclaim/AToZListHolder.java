@@ -28,6 +28,17 @@ public class AToZListHolder extends ParentViewHolder{
         super(itemView);
         mAToZTextView = (TextView) itemView.findViewById(R.id.a_to_z_list_text_view);
         mArrowExpandImageView = (ImageView) itemView.findViewById(R.id.arrow_expand_imageview);
+
+        mArrowExpandImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isExpanded()) {
+                    collapseView();
+                } else {
+                    expandView();
+                }
+            }
+        });
     }
 
     public void bind (AToZList aToZList) {
