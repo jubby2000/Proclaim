@@ -11,10 +11,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
-import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainActivityFragment.OnFragmentInteractionListener {
@@ -22,7 +24,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+//            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+//            Slide upSlide = new Slide(Gravity.TOP);
+//            Slide startSlide = new Slide(Gravity.START);
+//            upSlide.setDuration(1000);
+//            startSlide.setDuration(1000);
+//            getWindow().setEnterTransition(upSlide);
+//            getWindow().setExitTransition(startSlide);
+//        }
+
         setContentView(R.layout.activity_main);
+
+
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -44,11 +61,13 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Transition exit = new Slide();
-        getWindow().setExitTransition(exit);
+    }
 
-        Transition reenter = new Slide();
-        getWindow().setReenterTransition(reenter);
+    public void click(View view) {
+        Slide slide = new Slide(Gravity.START);
+
+        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+        TransitionManager.beginDelayedTransition(root, slide);
     }
 
     @Override

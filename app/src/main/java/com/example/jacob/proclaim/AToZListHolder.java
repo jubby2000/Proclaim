@@ -4,6 +4,7 @@ import android.os.Build;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
@@ -23,11 +24,14 @@ public class AToZListHolder extends ParentViewHolder{
 
     private TextView mAToZTextView;
     private final ImageView mArrowExpandImageView;
+    private LinearLayout mAToZListItem;
 
     public AToZListHolder(View itemView) {
         super(itemView);
         mAToZTextView = (TextView) itemView.findViewById(R.id.a_to_z_list_text_view);
         mArrowExpandImageView = (ImageView) itemView.findViewById(R.id.arrow_expand_imageview);
+        mAToZListItem = (LinearLayout) itemView.findViewById(R.id.a_to_z_list_item);
+
 
         mArrowExpandImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,8 +55,10 @@ public class AToZListHolder extends ParentViewHolder{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             if (expanded) {
                 mArrowExpandImageView.setRotation(ROTATED_POSITION);
+                itemView.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.GONE);
             } else {
                 mArrowExpandImageView.setRotation(INITIAL_POSITION);
+                itemView.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.VISIBLE);
             }
         }
     }

@@ -42,10 +42,6 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
-
 //        if (getArguments() != null) {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);
@@ -56,7 +52,7 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        final View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         Topic Atonement = new Topic("Atonement");
         Topic Adam = new Topic("Adam");
@@ -69,21 +65,23 @@ public class MainActivityFragment extends Fragment {
         AToZList B = new AToZList("B", Arrays.asList(Baptism, Bethesda, Bethlehem));
         final List<AToZList> aToZ = Arrays.asList(A, B);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.topic_list);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.topic_list);
+        //recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         mAdapter = new AToZAdapter(getContext(), aToZ);
+
         mAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
             @Override
             public void onListItemExpanded(int position) {
                 AToZList expandedList = aToZ.get(position);
-
-                Log.v(LOG_TAG, String.valueOf(expandedList));
+                //view.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.GONE);
+                Log.v(LOG_TAG, String.valueOf(position));
             }
 
             @Override
             public void onListItemCollapsed(int position) {
                 AToZList collapsedList = aToZ.get(position);
+                //view.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.VISIBLE);
             }
         });
 

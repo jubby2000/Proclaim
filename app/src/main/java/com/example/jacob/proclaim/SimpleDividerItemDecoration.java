@@ -33,6 +33,8 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
 
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
+
+
         }
     }
 }
