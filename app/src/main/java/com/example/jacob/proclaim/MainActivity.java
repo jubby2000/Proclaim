@@ -1,10 +1,13 @@
 package com.example.jacob.proclaim;
 
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,28 +15,40 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.animation.AnimationUtils;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainActivityFragment.OnFragmentInteractionListener {
+
+    final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-//            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 //            Slide upSlide = new Slide(Gravity.TOP);
-//            Slide startSlide = new Slide(Gravity.START);
-//            upSlide.setDuration(1000);
-//            startSlide.setDuration(1000);
-//            getWindow().setEnterTransition(upSlide);
-//            getWindow().setExitTransition(startSlide);
-//        }
+            Slide startSlide = new Slide(Gravity.START);
+            startSlide.setInterpolator(AnimationUtils.loadInterpolator(this,
+                    android.R.interpolator.linear_out_slow_in));
+
+//            upSlide.setDuration(500);
+            startSlide.setDuration(500);
+//            upSlide.addTarget(R.id.toolbar);
+//            startSlide.excludeTarget(R.id.toolbar, true);
+            startSlide.excludeTarget(android.R.id.statusBarBackground, true);
+            startSlide.excludeTarget(android.R.id.navigationBarBackground, true);
+            //getWindow().setEnterTransition(upSlide);
+            getWindow().setExitTransition(startSlide);
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -63,11 +78,16 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void click(View view) {
-        Slide slide = new Slide(Gravity.START);
+    public void click(View view, Intent intent) {
+        Log.v(LOG_TAG, "click method called");
+        //Slide slide = new Slide(Gravity.START);
 
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-        TransitionManager.beginDelayedTransition(root, slide);
+        TransitionManager.beginDelayedTransition(root);
+
+        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle();
+
+        this.startActivity(intent, bundle);
     }
 
     @Override

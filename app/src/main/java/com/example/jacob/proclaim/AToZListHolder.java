@@ -19,10 +19,12 @@ public class AToZListHolder extends ParentViewHolder{
      * @param itemView The {@link View} being hosted in this ViewHolder
      */
 
+    private final String LOG_TAG = AToZListHolder.class.getSimpleName();
     private static final float INITIAL_POSITION = 0.0f;
     private static final float ROTATED_POSITION = 180f;
 
     private TextView mAToZTextView;
+    private TextView mAToZSubTextView;
     private final ImageView mArrowExpandImageView;
     private LinearLayout mAToZListItem;
 
@@ -31,7 +33,7 @@ public class AToZListHolder extends ParentViewHolder{
         mAToZTextView = (TextView) itemView.findViewById(R.id.a_to_z_list_text_view);
         mArrowExpandImageView = (ImageView) itemView.findViewById(R.id.arrow_expand_imageview);
         mAToZListItem = (LinearLayout) itemView.findViewById(R.id.a_to_z_list_item);
-
+        mAToZSubTextView = (TextView) itemView.findViewById(R.id.a_to_z_list_sub_text);
 
         mArrowExpandImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +49,13 @@ public class AToZListHolder extends ParentViewHolder{
 
     public void bind (AToZList aToZList) {
         mAToZTextView.setText(aToZList.getName());
+
+//        String newString = "";
+//        for (int i = 0; i < aToZList.getChildItemList().size(); i++) {
+//            newString.concat(aToZList.getChildItemList().get(i).toString() + ", ");
+//            Log.v(LOG_TAG, );
+//        }
+//        mAToZSubTextView.setText(newString);
     }
 
     @Override
