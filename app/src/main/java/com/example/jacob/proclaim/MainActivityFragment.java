@@ -17,6 +17,7 @@ import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -192,14 +193,17 @@ public class MainActivityFragment extends Fragment {
     private List<AToZList> addTopics() {
         topics = new ArrayList<Topic>();
         List<AToZList> aToZ;
+        ArrayList<AToZList> clone;
         AToZList A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
         A=B=C=D=E=F=G=H=I=J=K=L=M=N=O=P=Q=R=S=T=U=V=W=X=Y=Z = null;
 
-        Cursor topicCursor = database.rawQuery("SELECT " + ExternalDbContract.QuoteEntry.TOPIC +
-                " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+        Cursor topicCursor;
 
         if (extras != null) {
             topicCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+        } else {
+            topicCursor = database.rawQuery("SELECT " + ExternalDbContract.QuoteEntry.TOPIC +
+                    " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
         }
 
         String firstLetter = "";
@@ -465,49 +469,21 @@ public class MainActivityFragment extends Fragment {
             }
         }finally {
             Log.v(LOG_TAG, "I got to the finally block!");
-            aToZ = Arrays.asList(A, B);//, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
+            aToZ = Arrays.asList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
 
             //TODO convert this to a mutable list to remove nulls
 
-            //aToZ.removeAll(Collections.singleton(null));
+//            aToZ.removeAll(Collections.singleton(null));
+
+            clone = new ArrayList<AToZList>();
+            clone.addAll(aToZ);
+            clone.removeAll(Collections.singleton(null));
 
         }
 
-//        for(topicCursor.moveToFirst(); !topicCursor.isAfterLast(); topicCursor.moveToNext()) {
-//            String firstLetter = topicCursor.getString(5).toUpperCase().substring(0, 1);
-//            Topic topicVar = new Topic(topicCursor.getString(5));
-//
-//            switch (firstLetter) {
-//                case "A":
-//                    A = new AToZList("A", getTopics(firstLetter));
-//
-//            }
-//
-//            AToZList letter = new AToZList(firstLetter, getTopics(firstLetter));
-//
-//
-//            topics.add(topicVar);
-//        }
-//
-//        final List<AToZList> aToZ = Arrays.asList(A);
-//                long id = topicCursor.getLong(0);
-//                Log.v(LOG_TAG, String.valueOf(topicCursor.getInt(0)) + " " + topicCursor.getString(1));
-//                String topic = topicCursor.getString(5);
-//
-//                String firstLetter = topic.toUpperCase().substring(0, 1);
-
-
-//                    Topic bethesda = new Topic("Bethesda");
-//
-//                    AToZList A = new AToZList("A", Arrays.asList(adam, abrahamicCovenant, atonement));
-//                    AToZList B = new AToZList("B", Arrays.asList(baptism, bethesda, bethlehem));
-//                    final List<AToZList> aToZ = Arrays.asList(A, B);
-//                    topics.add(new Topic(id, topic));
-
-        //Log.v(LOG_TAG, "I got to the topicCursor.close!");
         topicCursor.close();
         database.close();
-        return aToZ;
+        return clone;
         }
 //        quoteCursor.close();
 
@@ -556,16 +532,17 @@ public class MainActivityFragment extends Fragment {
 
         ArrayList<Topic> authors = new ArrayList<Topic>();
         LinkedHashSet<Topic> tempAuthors = new LinkedHashSet<Topic>();
-        String lastNameFirst;
-
-        String firstName = authorCursor.getString(1);
-        String lastName = authorCursor.getString(2);
-        String groupName = authorCursor.getString(3);
 
         for (authorCursor.moveToFirst(); !authorCursor.isAfterLast(); authorCursor.moveToNext()) {
+
+            String firstName = authorCursor.getString(1);
+            String lastName = authorCursor.getString(2);
+            String groupName = authorCursor.getString(3);
+            String lastNameFirst = lastName + ", " + firstName;
+
             if (groupName == null) {
                 if (lastName.toUpperCase().substring(0, 1).equals(firstLetter)) {
-                    authors.add(new Topic(lastName + ", " + firstName));
+                    authors.add(new Topic(lastNameFirst));
                 }
             } else {
                 if (groupName.substring(0, 3).equals("The ")) {

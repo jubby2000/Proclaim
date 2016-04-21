@@ -56,10 +56,21 @@ public class AToZListHolder extends ParentViewHolder{
 
             Topic topic = (Topic) obj;
 
+            String lastNameOnly = null;
+
+            if (topic.getName().contains(",")) {
+                lastNameOnly = topic.getName().substring(0, topic.getName().indexOf(","));
+            }
+
             if(builder.length() != 0) {
                 builder.append(", ");
             }
-            builder.append(topic.getName());
+            if (lastNameOnly == null) {
+                builder.append(topic.getName());
+            } else {
+                builder.append(lastNameOnly);
+            }
+
         }
 
         mAToZSubTextView.setText(builder.toString());
