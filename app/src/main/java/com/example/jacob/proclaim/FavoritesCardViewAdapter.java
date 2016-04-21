@@ -18,9 +18,9 @@ import android.view.ViewGroup;
 import java.util.List;
 
 /**
- * Created by jacob on 3/17/16.
+ * Created by jacob on 4/11/16.
  */
-public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> {
+public class FavoritesCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> {
 
     private final String LOG_TAG = DetailCardViewAdapter.class.getSimpleName();
 
@@ -35,7 +35,7 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
 
     ContentValues values = new ContentValues();
 
-    DetailCardViewAdapter(List<Quote> quotes) {
+    FavoritesCardViewAdapter(List<Quote> quotes) {
         this.quotes = quotes;
     }
 
@@ -97,7 +97,7 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
         holder.mQuoteView.setText(text);
         holder.mReferenceView.setText(sourceConcat);
 
-        //Set image as Favorite if already exists in the database
+        //Set image as Favorite if already favorited in the database
         if (quotes.get(position).favorite) {
             holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
             holder.mFavorite.getDrawable().mutate().setColorFilter(context.getColor(R.color.favorite), PorterDuff.Mode.SRC_ATOP);
@@ -110,38 +110,39 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
         holder.mFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!quotes.get(position).favorite) {
-                    holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
-                    holder.mFavorite.getDrawable().mutate().setColorFilter(v.getContext().getColor(R.color.favorite), PorterDuff.Mode.SRC_ATOP);
-
-                    values.put(ExternalDbContract.QuoteEntry.FAVORITE, "true");
-
-                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
-                            + quotes.get(position).id, null);
-
-                    Log.v(LOG_TAG, "SQL id position: " + quotes.get(position).id);
-
-                    Snackbar snackbar = Snackbar.make(v, "Added to your Favorites.", Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-
-                    quotes.get(position).favorite = true;
-//                    addItem(position);
-                    notifyDataSetChanged();
-                } else {
+//                if (!quotes.get(position).favorite) {
+//                    holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
+//                    holder.mFavorite.getDrawable().mutate().setColorFilter(v.getContext().getColor(R.color.favorite), PorterDuff.Mode.SRC_ATOP);
+//
+//                    values.put(ExternalDbContract.QuoteEntry.FAVORITE, "true");
+//
+//                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+//                            + quotes.get(position).id, null);
+//
+//                    Log.v(LOG_TAG, "SQL id position: " + quotes.get(position).id);
+//
+//                    Snackbar snackbar = Snackbar.make(v, "Added to your Favorites.", Snackbar.LENGTH_SHORT);
+//                    snackbar.show();
+//
+//                    quotes.get(position).favorite = true;
+////                    addItem(position);
+////                    notifyDataSetChanged();
+//                if (quotes.get(position).favorite) {
                     holder.mFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                     holder.mFavorite.getDrawable().mutate().setColorFilter(v.getContext().getColor(R.color.gray), PorterDuff.Mode.SRC_ATOP);
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "false");
                     db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
-                            + quotes.get(position).id, null);
+                            + quotes.get(holder.getAdapterPosition()).id, null);
 
                     Snackbar snackbar = Snackbar.make(v, "Removed from your Favorites.", Snackbar.LENGTH_SHORT);
                     snackbar.show();
 
-                    quotes.get(position).favorite = false;
-//                    removeItem(position);
-                    notifyDataSetChanged();
-                }
+                    quotes.get(holder.getAdapterPosition()).favorite = false;
+                    removeItem(holder.getAdapterPosition());
+
+//                    notifyDataSetChanged();
+//                }
             }
         });
     }

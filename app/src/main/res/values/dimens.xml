@@ -11,4 +11,6 @@
     <dimen name="topic_list_item_vertical_spacing">48dp</dimen>
     <dimen name="list_item_text_size">14sp</dimen>
     <dimen name="list_item_sub_text_size">12sp</dimen>
+    <dimen name="card_view_elevation">4dp</dimen>
+    <dimen name="card_view_elevation_touched">8dp</dimen>
 </resources>

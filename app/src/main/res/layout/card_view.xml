@@ -19,6 +19,7 @@
         android:focusable="true"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
+        android:stateListAnimator="@anim/card_elevation"
         card_view:cardElevation="4dp"
         android:layout_gravity="center"
         android:layout_width="match_parent"
@@ -36,11 +37,11 @@
 
                 <TextView
                     android:id="@+id/author_view"
-                    android:textAllCaps="true"
                     android:padding="12dp"
                     android:gravity="center_vertical|start"
                     android:layout_gravity="center_vertical"
                     android:textStyle="bold"
+                    android:textColor="@color/textColor"
                     android:fontFamily="serif"
                     android:layout_weight="7"
                     android:layout_width="0dp"
@@ -67,7 +68,7 @@
                 android:id="@+id/quote_view"
                 android:padding="12dp"
                 android:fontFamily="serif"
-                android:text="Sample Quote Sample Quote Sample Quote Sample Quote Sample Quote Sample Quote"
+                android:textColor="@color/textColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -80,8 +81,8 @@
                 android:id="@+id/reference_view"
                 android:padding="12dp"
                 android:fontFamily="serif"
+                android:textColor="@color/textColor"
                 android:textStyle="italic"
-                android:text="Sample Reference"
                 android:gravity="end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

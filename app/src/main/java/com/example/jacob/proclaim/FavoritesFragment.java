@@ -15,32 +15,26 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link DetailActivityFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link DetailActivityFragment#} factory method to
- * create an instance of this fragment.
+ * Created by jacob on 4/11/16.
  */
-public class DetailActivityFragment extends Fragment {
+public class FavoritesFragment extends Fragment {
 
-    final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
+    final String LOG_TAG = FavoritesFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
     private SQLiteDatabase database;
-    DetailCardViewAdapter mAdapter;
+    FavoritesCardViewAdapter mAdapter;
     private ArrayList<Quote> quotes;
 
-    public DetailActivityFragment() {
+    public FavoritesFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(LOG_TAG, "detail fragment created");
+        Log.v(LOG_TAG, "favorites fragment created");
 
     }
 
@@ -48,7 +42,7 @@ public class DetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.v(LOG_TAG, "made it to oncreate");
+//        Log.v(LOG_TAG, "made it to oncreate");
 
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
@@ -58,7 +52,7 @@ public class DetailActivityFragment extends Fragment {
 
         addQuotes();
 
-        mAdapter = new DetailCardViewAdapter(quotes);
+        mAdapter = new FavoritesCardViewAdapter(quotes);
 //        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
 
         final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
@@ -158,12 +152,12 @@ public class DetailActivityFragment extends Fragment {
                     quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
                 }
 
-                if (getActivity().getIntent().getStringExtra("Topic") != null) {
-                    Log.v(LOG_TAG, "From intent " + getActivity().getIntent().getStringExtra("Topic"));
-                    if (getActivity().getIntent().getStringExtra("Topic").equals(topic)) {
-                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
-                    }
-                }
+//                if (getActivity().getIntent().getStringExtra("Topic") != null) {
+//                    Log.v(LOG_TAG, "From intent " + getActivity().getIntent().getStringExtra("Topic"));
+//                    if (getActivity().getIntent().getStringExtra("Topic").equals(topic)) {
+//                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+//                    }
+//                }
 
 
 

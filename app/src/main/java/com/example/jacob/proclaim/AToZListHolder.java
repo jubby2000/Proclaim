@@ -50,6 +50,19 @@ public class AToZListHolder extends ParentViewHolder{
     public void bind (AToZList aToZList) {
         mAToZTextView.setText(aToZList.getName());
 
+        StringBuilder builder = new StringBuilder();
+
+        for(Object obj : aToZList.getChildItemList()) {
+
+            Topic topic = (Topic) obj;
+
+            if(builder.length() != 0) {
+                builder.append(", ");
+            }
+            builder.append(topic.getName());
+        }
+
+        mAToZSubTextView.setText(builder.toString());
 //        String newString = "";
 //        for (int i = 0; i < aToZList.getChildItemList().size(); i++) {
 //            newString.concat(aToZList.getChildItemList().get(i).toString() + ", ");
@@ -64,10 +77,10 @@ public class AToZListHolder extends ParentViewHolder{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             if (expanded) {
                 mArrowExpandImageView.setRotation(ROTATED_POSITION);
-                itemView.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.GONE);
+                mAToZSubTextView.setVisibility(View.GONE);
             } else {
                 mArrowExpandImageView.setRotation(INITIAL_POSITION);
-                itemView.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.VISIBLE);
+                mAToZSubTextView.setVisibility(View.VISIBLE);
             }
         }
     }

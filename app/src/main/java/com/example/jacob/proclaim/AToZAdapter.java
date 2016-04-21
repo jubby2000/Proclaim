@@ -38,9 +38,9 @@ public class AToZAdapter extends ExpandableRecyclerAdapter<AToZListHolder, Topic
 
     // onBind ...
     @Override
-    public void onBindParentViewHolder(AToZListHolder recipeViewHolder, int position, ParentListItem parentListItem) {
+    public void onBindParentViewHolder(AToZListHolder aToZListHolder, int position, ParentListItem parentListItem) {
         AToZList aToZList = (AToZList) parentListItem;
-        recipeViewHolder.bind(aToZList);
+        aToZListHolder.bind(aToZList);
     }
 
     @Override

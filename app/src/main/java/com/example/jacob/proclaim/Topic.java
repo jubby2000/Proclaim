@@ -13,4 +13,22 @@ public class Topic {
     public String getName() {
         return mName;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Topic)) {
+            return false;
+        }
+        Topic other = (Topic) obj;
+        return this.mName.equals(other.mName);
+    }
+
+    @Override
+    public int hashCode() {
+        return mName.hashCode();
+    }
+    // now override hashCode()
 }

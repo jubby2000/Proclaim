@@ -24,6 +24,7 @@
             android:id="@+id/a_to_z_list_text_view"
             android:gravity="center_vertical"
             android:textStyle="bold"
+            android:textColor="@color/textColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -31,7 +32,7 @@
             android:id="@+id/a_to_z_list_sub_text"
             android:gravity="center_vertical"
             android:textSize="@dimen/list_item_sub_text_size"
-            android:text="This is a test."
+            android:textColor="@color/subText"
             android:singleLine="true"
             android:ellipsize="middle"
             android:layout_width="match_parent"
