@@ -115,6 +115,8 @@ public class MainActivityFragment extends Fragment {
 
         aToZ = addTopics();
 
+        mAdapter = new AToZAdapter(getContext(), aToZ);
+
         mAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
             @Override
             public void onListItemExpanded(int position) {
@@ -130,7 +132,7 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        mAdapter = new AToZAdapter(getContext(), aToZ);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAdapter);
 
@@ -463,7 +465,7 @@ public class MainActivityFragment extends Fragment {
             }
         }finally {
             Log.v(LOG_TAG, "I got to the finally block!");
-            aToZ = Arrays.asList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
+            aToZ = Arrays.asList(A, B);//, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
 
             //TODO convert this to a mutable list to remove nulls
 
