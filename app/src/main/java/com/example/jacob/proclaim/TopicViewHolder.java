@@ -49,7 +49,7 @@ public class TopicViewHolder extends ChildViewHolder {
                 }
 
                 if (topic.getName().contains(",") && count <= 1) {
-                    firstName = topic.getName().substring(topic.getName().indexOf(",") + 1);
+                    firstName = topic.getName().substring(topic.getName().indexOf(",") + 2);
                     lastName = topic.getName().substring(0, topic.getName().indexOf(","));
                     reformatName = firstName + " " + lastName;
                 }

@@ -126,6 +126,7 @@ public class DetailActivityFragment extends Fragment {
     private void addQuotes() {
         quotes = new ArrayList<Quote>();
         Cursor quoteCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+        String currentTopic = getActivity().getIntent().getStringExtra("Topic");
 
         quoteCursor.moveToFirst();
         if(!quoteCursor.isAfterLast()) {
@@ -154,13 +155,17 @@ public class DetailActivityFragment extends Fragment {
                     favorite = true;
                 }
 
-                if (getActivity().getIntent().getStringExtra("Topic") == null && favorite) {
+                if (currentTopic == null && favorite) {
                     quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
                 }
 
-                if (getActivity().getIntent().getStringExtra("Topic") != null) {
-                    Log.v(LOG_TAG, "From intent " + getActivity().getIntent().getStringExtra("Topic"));
-                    if (getActivity().getIntent().getStringExtra("Topic").equals(topic)) {
+                if (currentTopic != null) {
+                    Log.v(LOG_TAG, "From intent " + currentTopic + firstName + " " + lastName);
+                    if (currentTopic.equals(topic)) {
+                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+                    } else if (currentTopic.equals(firstName + " " + lastName)){
+                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+                    } else if (currentTopic.equals(groupName)) {
                         quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
                     }
                 }
