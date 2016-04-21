@@ -35,7 +35,31 @@ public class TopicViewHolder extends ChildViewHolder {
 
                 Log.v(LOG_TAG, "onClick called");
                 Intent intent = new Intent(main, DetailActivity.class);
-                intent.putExtra("Topic", topic.getName());
+
+                String reformatName = null;
+                String firstName;
+                String lastName;
+                int count = 0;
+
+                for (int i = 0; i < topic.getName().length(); i++) {
+                    char c = topic.getName().charAt(i);
+                    if (String.valueOf(c).equals(",")) {
+                        count++;
+                    }
+                }
+
+                if (topic.getName().contains(",") && count <= 1) {
+                    firstName = topic.getName().substring(topic.getName().indexOf(",") + 1);
+                    lastName = topic.getName().substring(0, topic.getName().indexOf(","));
+                    reformatName = firstName + " " + lastName;
+                }
+
+                if (count != 1) {
+                    intent.putExtra("Topic", topic.getName());
+                } else {
+                    intent.putExtra("Topic", reformatName);
+                }
+
                 main.click(v, intent);
 
             }

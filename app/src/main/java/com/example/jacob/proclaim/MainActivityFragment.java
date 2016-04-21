@@ -219,10 +219,12 @@ public class MainActivityFragment extends Fragment {
                 //Check if group name is empty
                 } else if (topicCursor.getString(3) == null) {
                         firstLetter = topicCursor.getString(2).toUpperCase().substring(0, 1);
+                    Log.v(LOG_TAG, topicCursor.getString(2) + " " + firstLetter);
 
                 //Check if group name starts with The, and exclude it from firstLetter selection
-                    } else if (topicCursor.getString(3).substring(0, 2).equals("The")) {
+                    } else if (topicCursor.getString(3).substring(0, 3).equals("The")) {
                         firstLetter = topicCursor.getString(3).substring(4, 5);
+                    Log.v(LOG_TAG, topicCursor.getString(3) + " " + firstLetter);
                 }
 
                 switch (firstLetter) {
@@ -540,19 +542,24 @@ public class MainActivityFragment extends Fragment {
             String groupName = authorCursor.getString(3);
             String lastNameFirst = lastName + ", " + firstName;
 
+            //Check to make sure this isn't a group authored quote
             if (groupName == null) {
                 if (lastName.toUpperCase().substring(0, 1).equals(firstLetter)) {
                     authors.add(new Topic(lastNameFirst));
                 }
             } else {
-                if (groupName.substring(0, 3).equals("The ")) {
-                    authors.add(new Topic(groupName.substring(4) + ", " + groupName.substring(0, 2)));
+                //If it is, check that it starts with The and compensate
+                if (groupName.substring(0, 3).equals("The")) {
+                    if (groupName.substring(4, 5).equals(firstLetter)) {
+                        authors.add(new Topic(groupName.substring(4)
+                                + ", " + groupName.substring(0, 3)));
+                    }
+
                 } else {
+                    //Otherwise just add the group name
                     authors.add(new Topic(groupName));
                 }
             }
-
-            //Necessary to use a linkedhashset (see above) to not allow duplicate topics and also keep them alphabetical
         }
 
         tempAuthors.addAll(authors);

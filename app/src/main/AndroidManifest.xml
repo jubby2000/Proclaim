@@ -21,9 +21,13 @@
         <activity
             android:name=".DetailActivity"
             android:label="Topic"
-            android:parentActivityName=".MainActivity"
-            >
-        </activity>
+            android:parentActivityName=".MainActivity"></activity>
+
+        <provider
+            android:name=".MyContentProvider"
+            android:authorities="com.example.proclaim.provider"
+            android:enabled="true"
+            android:exported="true"></provider>
     </application>
 
 </manifest>
