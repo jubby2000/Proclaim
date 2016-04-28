@@ -31,6 +31,7 @@ public class MainActivityFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ArrayList<Topic> topics;
     Bundle extras;
+    RecyclerView mRecyclerView;
 
     public MainActivityFragment() {
         // Required empty public constructor
@@ -96,7 +97,7 @@ public class MainActivityFragment extends Fragment {
 //        AToZList B = new AToZList("B", Arrays.asList(baptism, bethesda, bethlehem));
 //        final List<AToZList> aToZ = Arrays.asList(A, B);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.topic_list);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.topic_list);
 //        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 //        recyclerView.setLayoutManager(layoutManager);
 //
@@ -134,8 +135,8 @@ public class MainActivityFragment extends Fragment {
         });
 
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setAdapter(mAdapter);
 
         return view;
     }
@@ -568,5 +569,9 @@ public class MainActivityFragment extends Fragment {
 
         authorCursor.close();
         return authors;
+    }
+
+    public void scrollToTop() {
+        mRecyclerView.smoothScrollToPosition(0);
     }
 }

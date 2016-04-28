@@ -32,6 +32,7 @@ public class DetailActivityFragment extends Fragment {
     private SQLiteDatabase database;
     DetailCardViewAdapter mAdapter;
     private ArrayList<Quote> quotes;
+    RecyclerView mRecyclerView;
 
     public DetailActivityFragment() {
         // Required empty public constructor
@@ -61,10 +62,10 @@ public class DetailActivityFragment extends Fragment {
         mAdapter = new DetailCardViewAdapter(quotes);
 //        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(mAdapter);
+//        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setAdapter(mAdapter);
 
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
 

@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -52,13 +53,21 @@ public class CardViewHolder extends RecyclerView.ViewHolder{
                 ClipData clip = ClipData.newPlainText("Quote", copyFullQuote);
                 clipboard.setPrimaryClip(clip);
 
-                Snackbar snackbar = Snackbar.make(v, "Copied to clipboard.", Snackbar.LENGTH_SHORT);
+                final Snackbar snackbar = Snackbar.make(itemView, "Copied to clipboard", Snackbar.LENGTH_SHORT);
+                snackbar.setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        snackbar.dismiss();
+                    }
+                });
                 snackbar.show();
             }
         });
 
-        mFavorite.getDrawable().mutate().setColorFilter(cardView.getContext()
-                .getColor(R.color.lightGray), PorterDuff.Mode.SRC_ATOP);
+        mFavorite.getDrawable()
+                .mutate()
+                .setColorFilter(ContextCompat.getColor(cardView.getContext(),
+                        R.color.lightGray), PorterDuff.Mode.SRC_ATOP);
 
 
 

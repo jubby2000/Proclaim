@@ -10,43 +10,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-        <!--<include-->
-            <!--layout="@layout/app_bar_main"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent" />-->
 
-        <!--<FrameLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent">-->
-
-            <!--<FrameLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:name="com.example.jacob.proclaim.MainActivityFragment"-->
-                <!--android:visibility="gone"-->
-                <!--android:id="@+id/author_bar_fragment" />-->
-
-            <!--<FrameLayout-->
-                <!--android:id="@+id/topic_bar_fragment"-->
-                <!--android:name="com.example.jacob.proclaim.MainActivityFragment"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent" />-->
-
-            <!--<FrameLayout-->
-                <!--android:id="@+id/favorite_bar_fragment"-->
-                <!--android:name="com.example.jacob.proclaim.DetailActivityFragment"-->
-                <!--android:visibility="gone"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent" />-->
-
-
-        <!--</FrameLayout>-->
-
-        <!--<fragment-->
-            <!--android:name="com.example.jacob.proclaim.MainActivityFragment"-->
-            <!--android:id="@+id/list"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
     </LinearLayout>
 
     <!--<android.support.design.widget.NavigationView-->

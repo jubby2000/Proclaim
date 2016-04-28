@@ -1,16 +1,22 @@
 package com.example.jacob.proclaim;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.transition.TransitionManager;
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     FavoritesFragment mFavoriteFragment;
     CoordinatorLayout mCoordinatorLayout;
     FragmentManager mFragmentManager = getSupportFragmentManager();
+    Snackbar mSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +55,6 @@ public class MainActivity extends AppCompatActivity
         mAuthorFragment = new MainActivityFragment();
         mTopicFragment = new MainActivityFragment();
         mFavoriteFragment = new FavoritesFragment();
-
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.add(R.id.author_bar_fragment, mAuthorFragment);
-//        transaction.add(R.id.topic_bar_fragment, mTopicFragment);
-//        transaction.add(R.id.favorite_bar_fragment, mFavoriteFragment);
-//        transaction.commit();
 
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
@@ -90,20 +91,19 @@ public class MainActivity extends AppCompatActivity
                 .commit();
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-
+        
         //To make this hide on scroll, adjust attach to attachShy with a CoordinatorLayout
         mBottomBar = BottomBar.attachShy(mCoordinatorLayout,
                 findViewById(R.id.fragment_container), savedInstanceState);
-//        mBottomBar.noTopOffset();
+        mBottomBar.noTopOffset();
         mBottomBar.noNavBarGoodness();
 
 //        mBottomBar.setActiveTabColor(ContextCompat.getColor(this, R.color.colorAccent));
-        
+
         mBottomBar.setDefaultTabPosition(1);
 
         mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
 
-            //                    Fragment author = fm.findFragmentById(R.id.author_bar_fragment);
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.author_bar_item) {
@@ -112,18 +112,15 @@ public class MainActivity extends AppCompatActivity
                         getSupportActionBar().setTitle(getString(R.string.author_bar_title));
                     }
 
-//                    FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft = mFragmentManager.beginTransaction();
-//                    ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-//                    ft.replace(R.id.fragment_container, mAuthorFragment);
-//                    ft.hide(mFavoriteFragment);
-//                    ft.hide(mTopicFragment);
                     Bundle args = new Bundle();
                     args.putString("Author", "Author");
                     mAuthorFragment.setArguments(args);
-
+                    ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+//                    ft.setTransition(ft.TRANSIT_FRAGMENT_FADE);
                     ft.replace(R.id.fragment_container, mAuthorFragment);
-                    ft.setTransition(ft.TRANSIT_FRAGMENT_FADE);
+//                    ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+
                     ft.commit();
                     // The user selected item number one.
                 }
@@ -133,14 +130,12 @@ public class MainActivity extends AppCompatActivity
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(getString(R.string.topic_bar_title));
                     }
-//                    FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft = mFragmentManager.beginTransaction();
-//                    ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-//                    ft.replace(R.id.fragment_container, mTopicFragment);
-//                    ft.hide(mFavoriteFragment);
+                    ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+//                    ft.setTransition(ft.TRANSIT_FRAGMENT_FADE);
                     ft.replace(R.id.fragment_container, mTopicFragment);
-//                    ft.hide(mAuthorFragment);
-                    ft.setTransition(ft.TRANSIT_FRAGMENT_FADE);
+//                    ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+
                     ft.commit();
                 }
                 if (menuItemId == R.id.favorite_bar_item) {
@@ -148,60 +143,33 @@ public class MainActivity extends AppCompatActivity
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(getString(R.string.favorite_bar_title));
                     }
-//                    FragmentManager fm = getSupportFragmentManager();
 
                     FragmentTransaction ft = mFragmentManager.beginTransaction();
-                    //ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-//                    ft.replace(R.id.fragment_container, mFavoriteFragment);
-                    ft.replace(R.id.fragment_container, new FavoritesFragment());
-//                    ft.hide(mTopicFragment);
-//                    ft.hide(mAuthorFragment);
-                    ft.setTransition(ft.TRANSIT_FRAGMENT_FADE);
+                    ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+//                    ft.setTransition(ft.TRANSIT_FRAGMENT_FADE);
+                    ft.replace(R.id.fragment_container, mFavoriteFragment);
+//                    ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+
                     ft.commit();
-
-
                     // The user selected item number three.
                 }
             }
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
-                if (menuItemId == R.id.author_bar_item) {
-//                    FragmentManager fm = getSupportFragmentManager();
-//
-//                    fm.findFragmentById(R.id.fragment_container).getView().scrollTo(0, 0);
-//                    fm.findFragmentById(R.id.fragment_container)
-                    // The user reselected item number one, scroll your content to top.
+
+                //Standard behavior is to scroll content to the top when the current tab is reselected
+                if (menuItemId == R.id.favorite_bar_item) {
+                    mFavoriteFragment.scrollToTop();
                 }
                 if (menuItemId == R.id.topic_bar_item) {
-                    // The user reselected item number one, scroll your content to top.
+                    mTopicFragment.scrollToTop();
                 }
-                if (menuItemId == R.id.favorite_bar_item) {
-                    // The user reselected item number one, scroll your content to top.
+                if (menuItemId == R.id.author_bar_item) {
+                    mAuthorFragment.scrollToTop();
                 }
             }
         });
-
-
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
 
     }
 
@@ -231,6 +199,32 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+//        if (searchManager == null) {
+//            Log.v(LOG_TAG, "searchManager is null!");
+//        }
+
+        MenuItem searchMenuItem = menu.findItem(R.id.menu_search);
+
+//        if (searchMenuItem == null) {
+//            Log.v(LOG_TAG, "searchMenuItem is null!");
+//        }
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+//        if (searchView == null) {
+//            Log.v(LOG_TAG, "searchView is null!");
+//        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(
+                    searchManager.getSearchableInfo(
+                            new ComponentName(getApplicationContext(), SearchActivity.class)));
+        }
+
+
         return true;
     }
 
@@ -248,33 +242,6 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_favorite) {
-//            Intent intent = new Intent(this, DetailActivity.class);
-//            intent.putExtra("Topic", "Favorites");
-//            startActivity(intent);
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

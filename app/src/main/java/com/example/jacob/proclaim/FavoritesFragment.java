@@ -26,6 +26,7 @@ public class FavoritesFragment extends Fragment {
     private SQLiteDatabase database;
     FavoritesCardViewAdapter mAdapter;
     private ArrayList<Quote> quotes;
+    RecyclerView mRecyclerView;
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -55,10 +56,10 @@ public class FavoritesFragment extends Fragment {
         mAdapter = new FavoritesCardViewAdapter(quotes);
 //        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setAdapter(mAdapter);
 
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -166,6 +167,10 @@ public class FavoritesFragment extends Fragment {
         }
 //        quoteCursor.close();
         database.close();
+    }
+
+    public void scrollToTop() {
+        mRecyclerView.smoothScrollToPosition(0);
     }
 
 }

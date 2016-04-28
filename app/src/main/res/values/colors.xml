@@ -9,4 +9,5 @@
     <color name="favorite">#EF5350</color>
     <color name="textColor">#212121</color>
     <color name="subText">#727272</color>
+    <color name="background">#fff3f3f3</color>
 </resources>

@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -100,10 +101,16 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
         //Set image as Favorite if already exists in the database
         if (quotes.get(position).favorite) {
             holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
-            holder.mFavorite.getDrawable().mutate().setColorFilter(context.getColor(R.color.favorite), PorterDuff.Mode.SRC_ATOP);
+            holder.mFavorite.getDrawable()
+                    .mutate()
+                    .setColorFilter(ContextCompat.getColor(context,
+                            R.color.favorite), PorterDuff.Mode.SRC_ATOP);
         } else {
             holder.mFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-            holder.mFavorite.getDrawable().mutate().setColorFilter(context.getColor(R.color.gray), PorterDuff.Mode.SRC_ATOP);
+            holder.mFavorite.getDrawable()
+                    .mutate()
+                    .setColorFilter(ContextCompat.getColor(context,
+                            R.color.gray), PorterDuff.Mode.SRC_ATOP);
         }
 
         //Switch image on click with a Snackbar to explain what's happening
@@ -112,7 +119,10 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
             public void onClick(View v) {
                 if (!quotes.get(position).favorite) {
                     holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
-                    holder.mFavorite.getDrawable().mutate().setColorFilter(v.getContext().getColor(R.color.favorite), PorterDuff.Mode.SRC_ATOP);
+                    holder.mFavorite.getDrawable()
+                            .mutate()
+                            .setColorFilter(ContextCompat.getColor(v.getContext(),
+                                    R.color.favorite), PorterDuff.Mode.SRC_ATOP);
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "true");
 
@@ -129,7 +139,10 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
                     notifyDataSetChanged();
                 } else {
                     holder.mFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                    holder.mFavorite.getDrawable().mutate().setColorFilter(v.getContext().getColor(R.color.gray), PorterDuff.Mode.SRC_ATOP);
+                    holder.mFavorite.getDrawable()
+                            .mutate()
+                            .setColorFilter(ContextCompat.getColor(v.getContext(),
+                                    R.color.gray), PorterDuff.Mode.SRC_ATOP);
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "false");
                     db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="

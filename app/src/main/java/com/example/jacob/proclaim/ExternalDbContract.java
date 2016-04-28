@@ -1,5 +1,6 @@
 package com.example.jacob.proclaim;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -9,6 +10,10 @@ public final class ExternalDbContract {
 
     public static final String DB_NAME = "quotes.db";
     public static final int DB_VERSION = 1;
+
+    public static final String CONTENT_AUTHORITY = "com.example.jacob.proclaim.MyContentProvider";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
 
     private ExternalDbContract() {}
 
@@ -30,4 +35,5 @@ public final class ExternalDbContract {
         public static final String USER_SUBMITTED = "User Submitted";
         public static final String FLAGGED = "Flagged";
     }
+
 }
