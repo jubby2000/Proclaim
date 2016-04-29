@@ -1,5 +1,6 @@
 package com.example.jacob.proclaim;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -34,6 +35,33 @@ public final class ExternalDbContract {
         public static final String FAVORITE = "Favorite";
         public static final String USER_SUBMITTED = "User Submitted";
         public static final String FLAGGED = "Flagged";
+
+        public static final Uri CONTENT_URI =
+                Uri.withAppendedPath(
+                        ExternalDbContract.BASE_CONTENT_URI,
+                        TABLE_NAME);
+
+        //TODO Update this with the real app name
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE +
+                        "/vnd.com.example.MyContentProvider." + TABLE_NAME;
+
+        //TODO Update this with the real app name
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                        "/vnd.com.example.MyContentProvider." + TABLE_NAME;
+        /**
+         * A projection of all columns
+         * in the items table.
+         */
+        public static final String[] PROJECTION_ALL =
+                {_ID, TOPIC, AUTHOR_FIRST_NAME, AUTHOR_LAST_NAME, AUTHOR_GROUP_NAME};
+        /**
+         * The default sort order for
+         * queries containing NAME fields.
+         */
+        public static final String SORT_ORDER_DEFAULT =
+                TOPIC + " ASC";
     }
 
 }

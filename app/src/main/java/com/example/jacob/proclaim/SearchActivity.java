@@ -60,27 +60,41 @@ public class SearchActivity extends ListActivity {
             String[] projection = new String[]{ExternalDbContract.QuoteEntry._ID, ExternalDbContract.QuoteEntry.TOPIC};
 
             ContentResolver resolver = getContentResolver();
+
+
+
+//            Cursor cursor = resolver.query(
+//                    MyContentProvider.TopicSearch.CONTENT_URI,
+//                    projection,
+//                    ExternalDbContract.QuoteEntry.TOPIC + " = ?" + " GROUP BY " + ExternalDbContract.QuoteEntry.TOPIC,//MyContentProvider.TopicSearch._ID + " = ? ",
+//                    new String[]{query},
+//                    null);
+
+//            Cursor cursor = resolver.query(
+//                    Uri.withAppendedPath(MyContentProvider.TopicSearch.CONTENT_URI, query),
+//                    null, "", null, "");
+
             Cursor cursor = resolver.query(
-                    MyContentProvider.TopicSearch.CONTENT_URI,
+                    ExternalDbContract.QuoteEntry.CONTENT_URI,
                     projection,
-                    ExternalDbContract.QuoteEntry.TOPIC + " = ?",//MyContentProvider.TopicSearch._ID + " = ? ",
-                    new String[]{query},
+                    ExternalDbContract.QuoteEntry.TOPIC + " = " + 5,
+                    new String[] {query},
                     null);
 
             if (cursor.moveToFirst()) {
                 do {
-                    long id = cursor.getLong(0);
-                    String topic = cursor.getString(1);
-                    Log.v(LOG_TAG, "ID is: " + id + ". And topic is: " + topic);
+//                    long id = cursor.getLong(0);
+                    String topic = cursor.getString(0);
+                    Log.v(LOG_TAG, "And topic is: " + topic);
                     // do something meaningful
                 } while (cursor.moveToNext());
             }
-
-//            Intent detailIntent = new Intent(this, DetailActivity.class);
-//            detailIntent.putExtra("Topic", query);
-//            startActivity(detailIntent);
-//            finish();
-            //TODO perform a search on this string query
+//
+////            Intent detailIntent = new Intent(this, DetailActivity.class);
+////            detailIntent.putExtra("Topic", query);
+////            startActivity(detailIntent);
+////            finish();
+//            //TODO perform a search on this string query
             if (cursor != null) {
                 cursor.close();
             }
