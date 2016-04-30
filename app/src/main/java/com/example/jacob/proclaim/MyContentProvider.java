@@ -38,7 +38,7 @@ public class MyContentProvider extends ContentProvider {
                 "quotes/",
                 AUTHOR_FIRST_NAME_LIST);
         URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Author First Name/#",
+                "Author First Name/*",
                 AUTHOR_FIRST_NAME_LIST_ID);
         URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
                 "Author Last Name",
@@ -56,7 +56,7 @@ public class MyContentProvider extends ContentProvider {
                 "Topic",
                 TOPIC_LIST);
         URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Topic/#",
+                "Topic/*",
                 TOPIC_LIST_ID);
         URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
                 "Popularity",

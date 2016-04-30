@@ -57,7 +57,12 @@ public class SearchActivity extends ListActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
 
-            String[] projection = new String[]{ExternalDbContract.QuoteEntry._ID, ExternalDbContract.QuoteEntry.TOPIC};
+            String[] projection = new String[]{
+                    ExternalDbContract.QuoteEntry._ID,
+                    "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\"",
+                    "\"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\"",
+                    "\"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\"",
+                    ExternalDbContract.QuoteEntry.TOPIC};
 
             ContentResolver resolver = getContentResolver();
 
@@ -77,15 +82,21 @@ public class SearchActivity extends ListActivity {
             Cursor cursor = resolver.query(
                     ExternalDbContract.QuoteEntry.CONTENT_URI,
                     projection,
-                    ExternalDbContract.QuoteEntry.TOPIC + " = " + 5,
+                    ExternalDbContract.QuoteEntry.TOPIC + " = ?"
+                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" = ?"
+                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" = ?"
+                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" = ?",
                     new String[] {query},
                     null);
 
             if (cursor.moveToFirst()) {
                 do {
-//                    long id = cursor.getLong(0);
-                    String topic = cursor.getString(0);
-                    Log.v(LOG_TAG, "And topic is: " + topic);
+                    long id = cursor.getLong(0);
+                    String first = cursor.getString(1);
+                    String last = cursor.getString(2);
+                    String group = cursor.getString(3);
+                    String topic = cursor.getString(4);
+                    Log.v(LOG_TAG, "First: " + first + ". Last: " + last + ". Group: " + group + ". And topic is: " + topic);
                     // do something meaningful
                 } while (cursor.moveToNext());
             }
