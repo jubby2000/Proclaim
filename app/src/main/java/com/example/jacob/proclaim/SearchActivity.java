@@ -100,6 +100,7 @@ public class SearchActivity extends ListActivity {
                     new String[] {query},
                     null);
 
+
             if (cursor.moveToFirst()) {
                 do {
                     long id = cursor.getLong(0);

@@ -45,12 +45,12 @@
             android:enabled="true"
             android:exported="true">
         </provider>
-        <provider
-            android:authorities="com.example.jacob.proclaim.RecentSuggestionsProvider"
-            android:exported="true"
-            android:enabled="true"
-            android:name=".RecentSuggestionsProvider" >
-        </provider>
+        <!--<provider-->
+            <!--android:authorities="com.example.jacob.proclaim.RecentSuggestionsProvider"-->
+            <!--android:exported="true"-->
+            <!--android:enabled="true"-->
+            <!--android:name=".RecentSuggestionsProvider" >-->
+        <!--</provider>-->
 
     </application>
 

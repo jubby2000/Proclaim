@@ -18,6 +18,16 @@ public class MyContentProvider extends ContentProvider {
     private ExternalDbOpenHelper mOpenHelper;
     private static final String DBNAME = ExternalDbContract.DB_NAME;
     private SQLiteDatabase db;
+    public static final String AUTHORITY = ExternalDbContract.CONTENT_AUTHORITY;
+
+    private static final String[] SEARCH_SUGGEST_COLUMNS = new String[] {
+            "_id",
+            SearchManager.SUGGEST_COLUMN_TEXT_1,
+            SearchManager.SUGGEST_COLUMN_ICON_1,
+            SearchManager.SUGGEST_COLUMN_INTENT_ACTION,
+            SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID };
+
+    private static final int SEARCH_SUGGEST = 20;
 
     private static final int AUTHOR_FIRST_NAME_LIST = 1;
     private static final int AUTHOR_LAST_NAME_LIST = 2;
@@ -35,48 +45,16 @@ public class MyContentProvider extends ContentProvider {
 
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "quotes/" + SearchManager.SUGGEST_URI_PATH_QUERY + "/*",
-                0);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+
+        URI_MATCHER.addURI(AUTHORITY,
                 "quotes/",
                 AUTHOR_FIRST_NAME_LIST);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Author First Name/*",
-//                AUTHOR_FIRST_NAME_LIST_ID);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Author Last Name",
-//                AUTHOR_LAST_NAME_LIST);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Author Last Name/#",
-//                AUTHOR_LAST_NAME_LIST_ID);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Author Group Name",
-//                AUTHOR_GROUP_LIST);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Author Group Name/#",
-//                AUTHOR_GROUP_LIST_ID);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Topic",
-//                TOPIC_LIST);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Topic/*",
-//                TOPIC_LIST_ID);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Popularity",
-//                POPULARITY_LIST);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Popularity/#",
-//                POPULARITY_LIST_ID);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Favorite",
-//                FAVORITE_LIST);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "Favorite/#",
-//                FAVORITE_LIST_ID);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                SearchManager.SUGGEST_URI_PATH_QUERY,
-//                FAVORITE_LIST_ID);
+        URI_MATCHER.addURI(AUTHORITY,
+                SearchManager.SUGGEST_URI_PATH_QUERY,
+                SEARCH_SUGGEST);
+        URI_MATCHER.addURI(AUTHORITY,
+                SearchManager.SUGGEST_URI_PATH_QUERY + "/*",
+                SEARCH_SUGGEST);
     }
 
     public MyContentProvider() {
@@ -124,6 +102,8 @@ public class MyContentProvider extends ContentProvider {
                 return ExternalDbContract.QuoteEntry.CONTENT_TYPE;
             case FAVORITE_LIST:
                 return ExternalDbContract.QuoteEntry.CONTENT_TYPE;
+            case SEARCH_SUGGEST:
+                return SearchManager.SUGGEST_MIME_TYPE;
             case 0:
                 return ExternalDbContract.QuoteEntry.CONTENT_ITEM_TYPE;
             default:
@@ -142,25 +122,17 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement this to handle query requests from clients.
-//        throw new UnsupportedOperationException("Not yet implemented");
-
-//        db = mOpenHelper.getReadableDatabase();
-//        SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
-//
-//        sqLiteQueryBuilder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//
-//
-//        selectionArgs[0] = "%" + selectionArgs[0] + "%";
-//
-//
-//        Cursor cursor = sqLiteQueryBuilder.query(db, projection, selection, selectionArgs, sortOrder);
 
         db = mOpenHelper.getReadableDatabase();
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         boolean useAuthorityUri = false;
         Log.v(LOG_TAG, uri.toString());
         switch (URI_MATCHER.match(uri)) {
+            case SEARCH_SUGGEST:
+                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
+                if(TextUtils.isEmpty(sortOrder)) {
+                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
+                }
             case AUTHOR_FIRST_NAME_LIST:
                 builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
                 if (TextUtils.isEmpty(sortOrder)) {
@@ -243,34 +215,4 @@ public class MyContentProvider extends ContentProvider {
 //        throw new UnsupportedOperationException("Not yet implemented");
         return 0;
     }
-
-//    private static Class[] contracts = new Class[]{TopicSearch.class};
-//
-//    @Override
-//    public SQLiteOpenHelper openHelper(Context context) {
-//        return new ProviGenOpenHelper(getContext(), DBNAME, null, 1, contracts);
-//    }
-//
-//    @Override
-//    public Class[] contractClasses() {
-//        return contracts;
-//    }
-//
-//    public interface TopicSearch extends ProviGenBaseContract {
-//
-//        @Column(Column.Type.TEXT)
-//        String TOPIC = "string";
-//
-//        @ContentUri
-//        Uri CONTENT_URI = Uri.parse(ExternalDbContract.BASE_CONTENT_URI + "/" + ExternalDbContract.QuoteEntry.TABLE_NAME);
-//    }
-
-//    public interface AuthorSearch extends ProviGenBaseContract {
-//
-//        @Column(Column.Type.TEXT)
-//        String AUTHOR = "string";
-//
-//        @ContentUri
-//        Uri CONTENT_URI = Uri.parse(ExternalDbContract.BASE_CONTENT_URI + "/" + ExternalDbContract.QuoteEntry.TABLE_NAME);
-//    }
 }

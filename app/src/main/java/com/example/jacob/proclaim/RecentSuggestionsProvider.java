@@ -7,7 +7,7 @@ import android.content.SearchRecentSuggestionsProvider;
  */
 public class RecentSuggestionsProvider extends SearchRecentSuggestionsProvider {
 
-    public static final String AUTHORITY = RecentSuggestionsProvider.class.getName();
+    public static final String AUTHORITY = ExternalDbContract.CONTENT_AUTHORITY;
 
     public static final int MODE = DATABASE_MODE_QUERIES;
 
