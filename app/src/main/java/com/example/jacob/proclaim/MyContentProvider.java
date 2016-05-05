@@ -1,5 +1,6 @@
 package com.example.jacob.proclaim;
 
+import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -8,8 +9,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 public class MyContentProvider extends ContentProvider {
+
+    private final String LOG_TAG = MyContentProvider.class.getSimpleName();
 
     private ExternalDbOpenHelper mOpenHelper;
     private static final String DBNAME = ExternalDbContract.DB_NAME;
@@ -31,45 +35,48 @@ public class MyContentProvider extends ContentProvider {
 
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-//                "quotes/" + SearchManager.SUGGEST_URI_PATH_QUERY + "/*",
-//                SEARCH_SUGGEST);
+        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+                "quotes/" + SearchManager.SUGGEST_URI_PATH_QUERY + "/*",
+                0);
         URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
                 "quotes/",
                 AUTHOR_FIRST_NAME_LIST);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Author First Name/*",
-                AUTHOR_FIRST_NAME_LIST_ID);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Author Last Name",
-                AUTHOR_LAST_NAME_LIST);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Author Last Name/#",
-                AUTHOR_LAST_NAME_LIST_ID);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Author Group Name",
-                AUTHOR_GROUP_LIST);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Author Group Name/#",
-                AUTHOR_GROUP_LIST_ID);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Topic",
-                TOPIC_LIST);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Topic/*",
-                TOPIC_LIST_ID);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Popularity",
-                POPULARITY_LIST);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Popularity/#",
-                POPULARITY_LIST_ID);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Favorite",
-                FAVORITE_LIST);
-        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
-                "Favorite/#",
-                FAVORITE_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Author First Name/*",
+//                AUTHOR_FIRST_NAME_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Author Last Name",
+//                AUTHOR_LAST_NAME_LIST);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Author Last Name/#",
+//                AUTHOR_LAST_NAME_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Author Group Name",
+//                AUTHOR_GROUP_LIST);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Author Group Name/#",
+//                AUTHOR_GROUP_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Topic",
+//                TOPIC_LIST);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Topic/*",
+//                TOPIC_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Popularity",
+//                POPULARITY_LIST);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Popularity/#",
+//                POPULARITY_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Favorite",
+//                FAVORITE_LIST);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                "Favorite/#",
+//                FAVORITE_LIST_ID);
+//        URI_MATCHER.addURI(ExternalDbContract.CONTENT_AUTHORITY,
+//                SearchManager.SUGGEST_URI_PATH_QUERY,
+//                FAVORITE_LIST_ID);
     }
 
     public MyContentProvider() {
@@ -152,6 +159,7 @@ public class MyContentProvider extends ContentProvider {
         db = mOpenHelper.getReadableDatabase();
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         boolean useAuthorityUri = false;
+        Log.v(LOG_TAG, uri.toString());
         switch (URI_MATCHER.match(uri)) {
             case AUTHOR_FIRST_NAME_LIST:
                 builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);

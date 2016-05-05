@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.ListView;
 
 /**
  * Created by jacob on 4/23/16.
@@ -48,6 +51,11 @@ public class SearchActivity extends ListActivity {
     }
 
     @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Intent intent = new Intent(this, DetailActivity.class);
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
     }
@@ -79,13 +87,16 @@ public class SearchActivity extends ListActivity {
 //                    Uri.withAppendedPath(MyContentProvider.TopicSearch.CONTENT_URI, query),
 //                    null, "", null, "");
 
+
+            //Didn't realize that spaces in table column names are bad news.
+            //Employing laziness by escaping quotes instead of fixing spaces.
             Cursor cursor = resolver.query(
                     ExternalDbContract.QuoteEntry.CONTENT_URI,
                     projection,
-                    ExternalDbContract.QuoteEntry.TOPIC + " = ?"
-                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" = ?"
-                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" = ?"
-                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" = ?",
+                    ExternalDbContract.QuoteEntry.TOPIC + " LIKE ?"
+                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ?"
+                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ?"
+                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ?",
                     new String[] {query},
                     null);
 
@@ -107,6 +118,14 @@ public class SearchActivity extends ListActivity {
 ////            finish();
 //            //TODO perform a search on this string query
             if (cursor != null) {
+
+                //Save the previous query to be provided as a suggestion later.
+                SearchRecentSuggestions suggestions =
+                        new SearchRecentSuggestions(this,
+                                RecentSuggestionsProvider.AUTHORITY,
+                                RecentSuggestionsProvider.MODE);
+                suggestions.saveRecentQuery(query, null);
+
                 cursor.close();
             }
         }
