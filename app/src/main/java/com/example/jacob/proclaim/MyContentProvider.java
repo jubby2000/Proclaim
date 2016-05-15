@@ -150,12 +150,36 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
         SEARCH_PROJECTION_MAP = new HashMap<String, String>();
         SEARCH_PROJECTION_MAP.put("_id", "_id");
         SEARCH_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_TEXT_1,
-                ExternalDbContract.QuoteEntry.TOPIC
+//                "CASE WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ? "
+//                        + "OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ? THEN \""
+//                        + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                        + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ? THEN \""
+//                        + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+//                        + "\" WHEN " + ExternalDbContract.QuoteEntry.TOPIC + " LIKE ? THEN "
+//                        + ExternalDbContract.QuoteEntry.TOPIC
+//                        + " END AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+
+//                "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                        + "\", \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+//                        + "\", " + ExternalDbContract.QuoteEntry.TOPIC
+//                        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+                //        from quotes where firstname like '%bert%' OR `lastname` like '%bert%'"
+
+        "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", _id FROM quotes"
+        + " UNION SELECT \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", _id FROM quotes"
+        + " UNION SELECT " + ExternalDbContract.QuoteEntry.TOPIC
+        + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+
+
+
+//        ExternalDbContract.QuoteEntry.TOPIC
 //                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME
 //                        + "\" || \" \" || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
 //                        + "\" OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
-                        + " AS "
-                        + SearchManager.SUGGEST_COLUMN_TEXT_1);
+//                        + " AS "
+//                        + SearchManager.SUGGEST_COLUMN_TEXT_1);
 //        SEARCH_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA,
 //                ExternalDbContract.QuoteEntry.QUOTE_ID
 //                        + " AS "
@@ -193,16 +217,20 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
                     if(TextUtils.isEmpty(sortOrder)) {
                         sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
                     }
-                    selection = ExternalDbContract.QuoteEntry.TOPIC + " LIKE ?";
-//                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ?"
-//                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ?"
-//                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ?";
+                    selection = ExternalDbContract.QuoteEntry.TOPIC + " LIKE ?"
+                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ?"
+                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ?"
+                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ?";
                     selectionArgs = new String[] {"%" + selectionArgs[0] + "%"};
-                    groupBy = ExternalDbContract.QuoteEntry.TOPIC;
+                    groupBy = SearchManager.SUGGEST_COLUMN_TEXT_1;
+//                            ExternalDbContract.QuoteEntry.TOPIC + ", \""
+//                            + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\", \""
+//                            + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\"";
 //                    builder.appendWhere(ExternalDbContract.QuoteEntry.TOPIC + " LIKE " + "\"" + selectionArgs[0] + "\"");
                     builder.setProjectionMap(SEARCH_PROJECTION_MAP);
 //                    builder2.setProjectionMap(SEARCH_AUTHOR_FULL_NAME_PROJECTION_MAP);
 //                    builder3.setProjectionMap(SEARCH_AUTHOR_GROUP_NAME_PROJECTION_MAP);
+
 
 
                     break;
@@ -298,6 +326,7 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
                         groupBy,
                         null,
                         sortOrder);
+
         // if we want to be notified of any changes:
 //        if (useAuthorityUri) {
 //            cursor.setNotificationUri(
