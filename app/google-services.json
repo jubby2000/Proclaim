@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "35398226447",
+    "project_id": "proclaim-b22bd"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35398226447:android:f26ba1343b8f75e1",
+        "android_client_info": {
+          "package_name": "com.example.jacob.proclaim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35398226447-3lfscm1d8pvo1b1uv989dqe7a4h9nqhd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jacob.proclaim",
+            "certificate_hash": "E6259AF8867D1BC31B19E0B69410F9F93649F962"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgHrJCTIW3SS2jI7nTbJBhZ9XBFne_9Xk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-77911508-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,7 +2,6 @@ package com.example.jacob.proclaim;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.support.design.widget.Snackbar;
@@ -31,12 +30,14 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
     String mItalics;
     String mUnderline;
     String mQuotationMark;
-    ExternalDbOpenHelper mDbHelper;
-    SQLiteDatabase db;
+//    ExternalDbOpenHelper mDbHelper;
+//    SQLiteDatabase db;
 
     ContentValues values = new ContentValues();
 
-    DetailCardViewAdapter(List<Quote> quotes) {
+    DetailCardViewAdapter(Context context, List<Quote> quotes) {
+
+        this.context = context;
         this.quotes = quotes;
     }
 
@@ -44,26 +45,27 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
     public CardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         CardViewHolder cardViewHolder = new CardViewHolder(view);
-        context = parent.getContext();
+//        context = parent.getContext();
         mBold = context.getResources().getString(R.string.format_text_bold);
         mItalics = context.getResources().getString(R.string.format_text_italics);
         mUnderline = context.getResources().getString(R.string.format_text_underline);
         mQuotationMark = context.getResources().getString(R.string.format_text_quotation_mark);
-        mDbHelper = new ExternalDbOpenHelper(context);
 
-        try {
-            mDbHelper.createDataBase();
-        } catch (Exception e) {
-            throw new Error("Unable to create database");
-        }
+//        mDbHelper = new ExternalDbOpenHelper(context);
 
-        try {
-            mDbHelper.openDataBase();
-        }catch(android.database.SQLException sqle) {
-            throw sqle;
-        }
-
-        db = mDbHelper.getWritableDatabase();
+//        try {
+//            mDbHelper.createDataBase();
+//        } catch (Exception e) {
+//            throw new Error("Unable to create database");
+//        }
+//
+//        try {
+//            mDbHelper.openDataBase();
+//        }catch(android.database.SQLException sqle) {
+//            throw sqle;
+//        }
+//
+//        db = mDbHelper.getWritableDatabase();
 
         return cardViewHolder;
     }
@@ -126,8 +128,13 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "true");
 
-                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+                    UpdateDataTask updateTask =
+                            new UpdateDataTask(context);
+                    updateTask.execute(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
                             + quotes.get(position).id, null);
+
+//                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+//                            + quotes.get(position).id, null);
 
                     Log.v(LOG_TAG, "SQL id position: " + quotes.get(position).id);
 
@@ -145,8 +152,14 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
                                     R.color.gray), PorterDuff.Mode.SRC_ATOP);
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "false");
-                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+
+                    UpdateDataTask updateTask =
+                            new UpdateDataTask(v.getContext());
+                    updateTask.execute(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
                             + quotes.get(position).id, null);
+
+//                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+//                            + quotes.get(position).id, null);
 
                     Snackbar snackbar = Snackbar.make(v, "Removed from your Favorites.", Snackbar.LENGTH_SHORT);
                     snackbar.show();

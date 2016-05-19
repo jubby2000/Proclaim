@@ -1,3 +1,4 @@
+/app/src/main/res/values/ignore_strings.xml
 *.iml
 .gradle
 /local.properties

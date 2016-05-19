@@ -9,11 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -29,6 +29,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.common.api.Result;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity
 
     final String LOG_TAG = MainActivity.class.getSimpleName();
     private BottomBar mBottomBar;
+    public static String PACKAGE_NAME;
+    int REQUEST_INVITE = 0;
     DetailCardViewAdapter mAdapter;
     MainActivityFragment mAuthorFragment;
     MainActivityFragment mTopicFragment;
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        PACKAGE_NAME = getApplicationContext().getPackageName();
         mAuthorFragment = new MainActivityFragment();
         mTopicFragment = new MainActivityFragment();
         mFavoriteFragment = new FavoritesFragment();
@@ -95,12 +100,11 @@ public class MainActivity extends AppCompatActivity
         //To make this hide on scroll, adjust attach to attachShy with a CoordinatorLayout
         mBottomBar = BottomBar.attachShy(mCoordinatorLayout,
                 findViewById(R.id.fragment_container), savedInstanceState);
-        mBottomBar.noTopOffset();
+//        mBottomBar.noTopOffset();
         mBottomBar.noNavBarGoodness();
-
-//        mBottomBar.setActiveTabColor(ContextCompat.getColor(this, R.color.colorAccent));
-
         mBottomBar.setDefaultTabPosition(1);
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
 
@@ -200,24 +204,19 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
 
+        MenuItem shareMenuItem = menu.findItem(R.id.menu_share);
+        shareMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                onInviteClicked();
+                return true;
+            }
+        });
+
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
-//        if (searchManager == null) {
-//            Log.v(LOG_TAG, "searchManager is null!");
-//        }
-
         MenuItem searchMenuItem = menu.findItem(R.id.menu_search);
-
-//        if (searchMenuItem == null) {
-//            Log.v(LOG_TAG, "searchMenuItem is null!");
-//        }
-
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-
-//        if (searchView == null) {
-//            Log.v(LOG_TAG, "searchView is null!");
-//        }
         if (searchView != null) {
             searchView.setSearchableInfo(
                     searchManager.getSearchableInfo(
@@ -227,6 +226,38 @@ public class MainActivity extends AppCompatActivity
 
         return true;
     }
+
+    private void onInviteClicked() {
+        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                .setMessage(getString(R.string.invitation_message))
+//                .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
+//                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+//                .setCallToActionText(getString(R.string.invitation_cta))
+                .build();
+        startActivityForResult(intent, REQUEST_INVITE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.v(LOG_TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Check how many invitations were sent and log a message
+                // The ids array contains the unique invitation ids for each invitation sent
+                // (one for each contact select by the user). You can use these for analytics
+                // as the ID will be consistent on the sending and receiving devices.
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                Log.v(LOG_TAG, "Hey, you just sent " + ids.length + " invites! Thank you!");
+            } else {
+                // Sending failed or it was canceled, show failure message to the user
+//                showMessage(getString(R.string.send_failed));
+                Log.v(LOG_TAG, "Sending failed.");
+            }
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

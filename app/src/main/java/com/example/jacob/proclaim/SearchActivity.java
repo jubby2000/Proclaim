@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
@@ -13,7 +14,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by jacob on 4/23/16.
@@ -27,6 +33,17 @@ public class SearchActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_search);
+
+
+
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.search_toolbar);
+//        setSupportActionBar(toolbar);
+//
+//        if (topicName != null && getSupportActionBar() != null) {
+//            getSupportActionBar().setTitle(topicName);
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//            getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        }
 
         handleIntent(getIntent());
     }
@@ -53,6 +70,10 @@ public class SearchActivity extends ListActivity {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         Intent intent = new Intent(this, DetailActivity.class);
+        String topic = listView.getItemAtPosition(position).toString();
+        intent.putExtra("Topic", topic);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -74,34 +95,23 @@ public class SearchActivity extends ListActivity {
 
             ContentResolver resolver = getContentResolver();
 
-
-
-//            Cursor cursor = resolver.query(
-//                    MyContentProvider.TopicSearch.CONTENT_URI,
-//                    projection,
-//                    ExternalDbContract.QuoteEntry.TOPIC + " = ?" + " GROUP BY " + ExternalDbContract.QuoteEntry.TOPIC,//MyContentProvider.TopicSearch._ID + " = ? ",
-//                    new String[]{query},
-//                    null);
-
-//            Cursor cursor = resolver.query(
-//                    Uri.withAppendedPath(MyContentProvider.TopicSearch.CONTENT_URI, query),
-//                    null, "", null, "");
-
-
             //Didn't realize that spaces in table column names are bad news.
             //Employing laziness by escaping quotes instead of fixing spaces.
             Cursor cursor = resolver.query(
                     ExternalDbContract.QuoteEntry.CONTENT_URI,
                     projection,
-                    ExternalDbContract.QuoteEntry.TOPIC + " LIKE ?"
-                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ?"
-                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ?"
-                            + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ?",
-                    new String[] {query},
+                    "LOWER(" + ExternalDbContract.QuoteEntry.TOPIC + ") LIKE LOWER(?)"
+                            + " OR LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\") LIKE LOWER(?)"
+                            + " OR LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\") LIKE LOWER(?)"
+                            + " OR LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\") LIKE LOWER(?)",
+                    new String[] {"%" + query + "%"},
                     null);
 
+            List<String> searchResults = new ArrayList<String>();
 
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.getCount() > 0) {
+                Log.v(LOG_TAG, "I made it past the null/count check!");
+                cursor.moveToFirst();
                 do {
                     long id = cursor.getLong(0);
                     String first = cursor.getString(1);
@@ -110,8 +120,34 @@ public class SearchActivity extends ListActivity {
                     String topic = cursor.getString(4);
                     Log.v(LOG_TAG, "First: " + first + ". Last: " + last + ". Group: " + group + ". And topic is: " + topic);
                     // do something meaningful
+
+
+//                    Log.v(LOG_TAG, "Group is: " + group.toLowerCase() +". And query is: " + query);
+                    if (group != null && group.toLowerCase().contains(query.toLowerCase())
+                            && !searchResults.contains(group)) {
+                        searchResults.add(group);
+                    }
+                    if (first != null && first.toLowerCase().contains(query.toLowerCase())
+                            && !searchResults.contains(first + " " + last)) {
+                        searchResults.add(first + " " + last);
+                    }
+
+                    if (last != null && last.toLowerCase().contains(query.toLowerCase())
+                            && !searchResults.contains(first + " " + last)) {
+                        searchResults.add(first + " " + last);
+                    }
+
+                    if (topic != null && topic.toLowerCase().contains(query.toLowerCase())
+                            && !searchResults.contains(topic)) {
+                        searchResults.add(topic);
+                    }
+
                 } while (cursor.moveToNext());
             }
+
+            Collections.sort(searchResults);
+
+            setListAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, searchResults));
 //
 ////            Intent detailIntent = new Intent(this, DetailActivity.class);
 ////            detailIntent.putExtra("Topic", query);
@@ -129,6 +165,13 @@ public class SearchActivity extends ListActivity {
 
                 cursor.close();
             }
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri detailUri = intent.getData();
+            String id = detailUri.getLastPathSegment();
+            Intent detailsIntent = new Intent(getApplicationContext(), DetailActivity.class);
+            detailsIntent.putExtra("Topic", id);
+            startActivity(detailsIntent);
+            finish();
         }
     }
 

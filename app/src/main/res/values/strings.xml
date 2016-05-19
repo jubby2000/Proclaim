@@ -16,4 +16,16 @@
     <string name="favorite_bar_title">Favorites</string>
     <string name="search_hint">Search topics and authors</string>
     <string name="search_title">Search</string>
+    <string name="share_title">Share</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="appwidget_title">Quote of the Day</string>
+    <string name="add_widget">Add widget</string>
+    <string name="title_activity_detail2">DetailActivity2</string>
+
+    <string name="invitation_title">This is my app.</string>
+    <string name="invitation_message">You should get it.</string>
+    <!-- -
+        This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
+        For more information, see https://support.google.com/admob/answer/3052638
+    <!- -->
 </resources>

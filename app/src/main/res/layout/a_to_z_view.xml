@@ -13,7 +13,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:gravity="center_vertical"
+        android:gravity="start|center_vertical"
         android:orientation="vertical"
         android:animateLayoutChanges="true"
         android:layout_weight="1"
@@ -22,7 +22,7 @@
 
         <TextView
             android:id="@+id/a_to_z_list_text_view"
-            android:gravity="center_vertical"
+            android:gravity="start|center_vertical"
             android:textStyle="bold"
             android:textColor="@color/textColor"
             android:layout_width="match_parent"
@@ -30,7 +30,7 @@
 
         <TextView
             android:id="@+id/a_to_z_list_sub_text"
-            android:gravity="center_vertical"
+            android:gravity="start|center_vertical"
             android:textSize="@dimen/list_item_sub_text_size"
             android:textColor="@color/subText"
             android:singleLine="true"
@@ -44,7 +44,7 @@
 
 
     <ImageView android:id="@+id/arrow_expand_imageview"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="end|center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_keyboard_arrow_up_black_24dp"/>

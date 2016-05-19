@@ -32,7 +32,7 @@ public class ExternalDbOpenHelper extends SQLiteOpenHelper {
         super(context, ExternalDbContract.DB_NAME, null, ExternalDbContract.DB_VERSION);
         this.context = context;
         //Write a full path to the databases of your application
-        String packageName = context.getPackageName();
+        String packageName = MainActivity.PACKAGE_NAME;
         DB_PATH = String.format("//data//data//%s//databases//", packageName);
         DB_NAME = ExternalDbContract.DB_NAME;
         //openDataBase();

@@ -5,6 +5,7 @@ android:layout_height="match_parent"
 android:fitsSystemWindows="true"
 android:id="@+id/detail_coordinator_layout"
 xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:ads="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 tools:context="com.example.jacob.proclaim.DetailActivity"
 xmlns:android="http://schemas.android.com/apk/res/android">
@@ -32,5 +33,16 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:background="@color/background"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/detail_fragment_container" />
+
+    <!-- view for AdMob Banner Ad -->
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id" />
 
 </android.support.design.widget.CoordinatorLayout>

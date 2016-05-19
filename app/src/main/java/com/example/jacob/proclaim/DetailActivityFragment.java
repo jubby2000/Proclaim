@@ -59,7 +59,7 @@ public class DetailActivityFragment extends Fragment {
 
         addQuotes();
 
-        mAdapter = new DetailCardViewAdapter(quotes);
+        mAdapter = new DetailCardViewAdapter(this.getContext(), quotes);
 //        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
 
 //        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);

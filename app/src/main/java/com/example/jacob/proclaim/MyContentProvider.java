@@ -11,8 +11,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.util.HashMap;
-
 public class MyContentProvider extends SearchRecentSuggestionsProvider {
 
     private final String LOG_TAG = MyContentProvider.class.getSimpleName();
@@ -144,20 +142,28 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
 //                        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
 //    }
 
-    private static final HashMap<String, String> SEARCH_PROJECTION_MAP;
-    static {
-
-        SEARCH_PROJECTION_MAP = new HashMap<String, String>();
-        SEARCH_PROJECTION_MAP.put("_id", "_id");
-        SEARCH_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_TEXT_1,
-//                "CASE WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ? "
-//                        + "OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ? THEN \""
+//    private static final HashMap<String, String> SEARCH_PROJECTION_MAP;
+//    static {
+//
+//        SEARCH_PROJECTION_MAP = new HashMap<String, String>();
+//        SEARCH_PROJECTION_MAP.put("_id", "_id");
+//        SEARCH_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_TEXT_1,
+//                "SELECT CASE WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ? THEN \""
+//                        + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                        + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ? THEN \""
 //                        + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
 //                        + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ? THEN \""
 //                        + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
 //                        + "\" WHEN " + ExternalDbContract.QuoteEntry.TOPIC + " LIKE ? THEN "
 //                        + ExternalDbContract.QuoteEntry.TOPIC
-//                        + " END AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+//                        + " END AS " + SearchManager.SUGGEST_COLUMN_TEXT_1
+//                        + ", _id FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME
+//                        + " WHERE (" + ExternalDbContract.QuoteEntry.TOPIC + " LIKE ? OR \""
+//                        + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ? OR \""
+//                        + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ? OR \""
+//                        + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ?)"
+//                        + " GROUP BY " + SearchManager.SUGGEST_COLUMN_TEXT_1
+//                        + " ORDER BY " + SearchManager.SUGGEST_COLUMN_TEXT_1 + " ASC");
 
 //                "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
 //                        + "\", \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
@@ -165,12 +171,12 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
 //                        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
                 //        from quotes where firstname like '%bert%' OR `lastname` like '%bert%'"
 
-        "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
-        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", _id FROM quotes"
-        + " UNION SELECT \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
-        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", _id FROM quotes"
-        + " UNION SELECT " + ExternalDbContract.QuoteEntry.TOPIC
-        + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+//        "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", _id FROM quotes"
+//        + " UNION SELECT \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+//        + "\" AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", _id FROM quotes"
+//        + " UNION SELECT " + ExternalDbContract.QuoteEntry.TOPIC
+//        + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
 
 
 
@@ -185,29 +191,60 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
 //                        + " AS "
 //                        + SearchManager.SUGGEST_COLUMN_INTENT_DATA);
 
-    }
+//    }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
+//        final HashMap<String, String> SEARCH_PROJECTION_MAP;
+//
+//            SEARCH_PROJECTION_MAP = new HashMap<String, String>();
+//            SEARCH_PROJECTION_MAP.put("_id", "_id AS _id");
+//            SEARCH_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_TEXT_1,
+//                    "CASE WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE '%" + selectionArgs[0] + "%' THEN \""
+//                            + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                            + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE '%" + selectionArgs[0] + "%' THEN \""
+//                            + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                            + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE '%" + selectionArgs[0] + "%' THEN \""
+//                            + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+//                            + "\" WHEN " + ExternalDbContract.QuoteEntry.TOPIC + " LIKE '%" + selectionArgs[0] + "%' THEN "
+//                            + ExternalDbContract.QuoteEntry.TOPIC
+//                            + " END AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+
+//        SELECT CASE WHEN "Author First Name" LIKE '%th%' THEN "Author First Name" || ' ' || "Author Last Name"
+//        WHEN "Author Last Name" LIKE '%th%' THEN "Author First Name" || ' ' || "Author Last Name"
+//        WHEN "Author Group Name" LIKE '%th%' THEN "Author Group Name"
+//        WHEN Topic LIKE '%th%' THEN Topic END AS suggest_text_1, _id FROM quotes
+//        WHERE (Topic LIKE '%th%' OR "Author First Name" LIKE '%a%'
+//        OR "Author Group Name" LIKE '%th%' OR "Author Last Name" LIKE '%th%') GROUP BY suggest_text_1 ORDER BY suggest_text_1 ASC
+
+//        SELECT CASE WHEN "Author First Name" LIKE '%a%' THEN "Author First Name" || ' ' || "Author Last Name"
+//        WHEN "Author Last Name" LIKE '%a%' THEN "Author First Name" || ' ' || "Author Last Name"
+//        WHEN "Author Group Name" LIKE '%a%' THEN "Author Group Name"
+//        WHEN Topic LIKE '%a%' THEN Topic END AS suggest_text_1, _id FROM quotes
+//        WHERE (Topic LIKE ? OR "Author First Name" LIKE ? OR "Author Last Name" LIKE ?
+//        OR "Author Group Name" LIKE ?) GROUP BY suggest_text_1 HAVING %a% ORDER BY suggest_text_1 ASC LIMIT 50
+
+//        Log.v(LOG_TAG, "CASE WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE '%" + selectionArgs[0] + "%' THEN \""
+//                + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE '%" + selectionArgs[0] + "%' THEN \""
+//                + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+//                + "\" WHEN \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE '%" + selectionArgs[0] + "%' THEN \""
+//                + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+//                + "\" WHEN " + ExternalDbContract.QuoteEntry.TOPIC + " LIKE '%" + selectionArgs[0] + "%' THEN "
+//                + ExternalDbContract.QuoteEntry.TOPIC
+//                + " END AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+
         Log.v(LOG_TAG, uri.toString());
-//        String query = "SELECT Topic FROM quotes WHERE Topic LIKE \"" + selectionArgs[0] +
-//                "\" UNION SELECT \"Author First Name\" || ' ' || \"Author Last Name\" FROM quotes WHERE \"Author First Name\" LIKE \"" + selectionArgs[0] + "\" OR " + "\"Author First Name\" LIKE \"" + selectionArgs[0] +
-//                "\" UNION SELECT \"Author Group Name\" FROM quotes WHERE \"Author Group Name\" LIKE \"" + selectionArgs[0] +
-//                "\" ORDER BY Topic, \"Author First Name\" || ' ' || \"Author Last Name\", \"Author Group Name\" LIMIT 10";
 
         String groupBy = null;
         db = mOpenHelper.getReadableDatabase();
-//        Log.v(LOG_TAG, DatabaseUtils.dumpCursorToString(db.rawQuery(query, selectionArgs)));
 
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-//        SQLiteQueryBuilder builder2 = new SQLiteQueryBuilder();
-//        SQLiteQueryBuilder builder3 = new SQLiteQueryBuilder();
         builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//        builder2.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//        builder3.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//        boolean useAuthorityUri = false;
+        boolean useSuggest = false;
+
         switch (URI_MATCHER.match(uri)) {
             case SEARCH_SUGGEST:
                 Log.v(LOG_TAG, "Query is: " + selectionArgs[0]);
@@ -215,117 +252,81 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
                     break;
                 } else {
                     if(TextUtils.isEmpty(sortOrder)) {
-                        sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
+                        sortOrder = SearchManager.SUGGEST_COLUMN_TEXT_1 + " ASC";
                     }
-                    selection = ExternalDbContract.QuoteEntry.TOPIC + " LIKE ?"
-                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" LIKE ?"
-                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\" LIKE ?"
-                        + " OR \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\" LIKE ?";
+                    selection = "LOWER("+ ExternalDbContract.QuoteEntry.TOPIC + ") LIKE LOWER(?)"
+                        + " OR LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\") LIKE LOWER(?)"
+                        + " OR LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\") LIKE LOWER(?)"
+                        + " OR LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\") LIKE (?)";
                     selectionArgs = new String[] {"%" + selectionArgs[0] + "%"};
                     groupBy = SearchManager.SUGGEST_COLUMN_TEXT_1;
-//                            ExternalDbContract.QuoteEntry.TOPIC + ", \""
-//                            + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\", \""
-//                            + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\"";
-//                    builder.appendWhere(ExternalDbContract.QuoteEntry.TOPIC + " LIKE " + "\"" + selectionArgs[0] + "\"");
-                    builder.setProjectionMap(SEARCH_PROJECTION_MAP);
-//                    builder2.setProjectionMap(SEARCH_AUTHOR_FULL_NAME_PROJECTION_MAP);
-//                    builder3.setProjectionMap(SEARCH_AUTHOR_GROUP_NAME_PROJECTION_MAP);
-
-
-
+//                    builder.setProjectionMap(SEARCH_PROJECTION_MAP);
+                    useSuggest = true;
                     break;
                 }
             case ALL_ROWS:
+                useSuggest = false;
+//                selectionArgs = new String[] {"%" + selectionArgs[0] + "%"};
                 Log.v(LOG_TAG, "I made it to ALL_ROWS!");
                 break;
             case SINGLE_ROW:
                 Log.v(LOG_TAG, "I made it to SINGLE_ROW!");
-                builder.appendWhere(ExternalDbContract.QuoteEntry.QUOTE_ID + "-" + uri.getLastPathSegment());
+//                builder.appendWhere(ExternalDbContract.QuoteEntry.QUOTE_ID + "-" + uri.getLastPathSegment());
                 break;
-//            case AUTHOR_FIRST_NAME_LIST:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                if (TextUtils.isEmpty(sortOrder)) {
-//                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
-//                }
-//                useAuthorityUri = true;
-//                break;
-//            case AUTHOR_LAST_NAME_LIST:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                if (TextUtils.isEmpty(sortOrder)) {
-//                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
-//                }
-//                useAuthorityUri = true;
-//                break;
-//            case AUTHOR_GROUP_LIST:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                if (TextUtils.isEmpty(sortOrder)) {
-//                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
-//                }
-//                useAuthorityUri = true;
-//                break;
-//            case TOPIC_LIST:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                if (TextUtils.isEmpty(sortOrder)) {
-//                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
-//                }
-//                useAuthorityUri = true;
-//                break;
-//            case POPULARITY_LIST:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                if (TextUtils.isEmpty(sortOrder)) {
-//                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
-//                }
-//                break;
-//            case FAVORITE_LIST:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                if (TextUtils.isEmpty(sortOrder)) {
-//                    sortOrder = ExternalDbContract.QuoteEntry.SORT_ORDER_DEFAULT;
-//                }
-//                break;
-//            case 0:
-//                builder.setTables(ExternalDbContract.QuoteEntry.TABLE_NAME);
-//                // limit query to one row at most:
-//                builder.appendWhere(ExternalDbContract.QuoteEntry._ID + " = " +
-//                        uri.getLastPathSegment());
-//                useAuthorityUri = true;
             default:
                 throw new IllegalArgumentException(
                         "Unsupported URI: " + uri);
         }
 
-//        String query = builder.buildQuery(
-//                projection,
-//                selection,
-//                selectionArgs[0],
-//                groupBy,
-//                null,
-//                sortOrder);
-//
-//        String query2 = builder2.buildQuery(
-//                projection,
-//                selection,
-//                selectionArgs[0],
-//                groupBy,
-//                null,
-//                sortOrder);
-//
-//        String query3 = builder3.buildQuery(
-//                projection,
-//                selection,
-//                selectionArgs[0],
-//                groupBy,
-//                null,
-//                sortOrder);
+//        String query = builder.buildQuery(projection, selection, groupBy, selectionArgs[0], sortOrder, "50");
+//        Log.v(LOG_TAG, query);
 
-        Cursor cursor =
-                builder.query(
-                        db,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        groupBy,
-                        null,
-                        sortOrder);
+        Cursor cursor;
+
+        if(useSuggest) {
+            Log.v(LOG_TAG, "I made it to useSuggest!");
+            //This first portion is to select first name+last name, group name, and topics all in one as suggestions
+            cursor = db.rawQuery("SELECT CASE WHEN LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN \""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+                    + "\" WHEN LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN \""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+                    + "\" WHEN LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN \""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+                    + "\" WHEN LOWER(" + ExternalDbContract.QuoteEntry.TOPIC + ") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN "
+                    + ExternalDbContract.QuoteEntry.TOPIC
+                    + " END AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ", "
+
+                    //This portion is to select the same thing as above, but for the intent data,
+                    //which the detail activity only knows how to handle as a string, not a column id
+                    + "CASE WHEN LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN \""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+                    + "\" WHEN LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN \""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\" || ' ' || \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
+                    + "\" WHEN LOWER(\"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN \""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
+                    + "\" WHEN LOWER(" + ExternalDbContract.QuoteEntry.TOPIC + ") LIKE LOWER(\"" + selectionArgs[0] + "\") THEN "
+                    + ExternalDbContract.QuoteEntry.TOPIC
+                    + " END AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID + ", _id"
+
+                    //More flexible search parameters, sorting etc.
+                    + " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME
+                    + " WHERE (LOWER(" + ExternalDbContract.QuoteEntry.TOPIC + ") LIKE LOWER(\"" + selectionArgs[0] + "\") OR LOWER(\""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") OR LOWER(\""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\") OR LOWER (\""
+                    + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\") LIKE LOWER(\"" + selectionArgs[0] + "\"))"
+                    + " GROUP BY " + SearchManager.SUGGEST_COLUMN_TEXT_1
+                    + " ORDER BY " + SearchManager.SUGGEST_COLUMN_TEXT_1 + " ASC", null);
+        } else {
+            Log.v(LOG_TAG, "I made it to queryBuilder!");
+            cursor = builder.query(
+                    db,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    groupBy,
+                    null,
+                    sortOrder);
+        }
 
         // if we want to be notified of any changes:
 //        if (useAuthorityUri) {
@@ -334,7 +335,8 @@ public class MyContentProvider extends SearchRecentSuggestionsProvider {
 //                    ExternalDbContract.BASE_CONTENT_URI);
 //        }
 //        else {
-            cursor.setNotificationUri(
+        Log.v(LOG_TAG, "I made it to setNotificationUri");
+        cursor.setNotificationUri(
                     getContext().getContentResolver(),
                     uri);
 //        }
