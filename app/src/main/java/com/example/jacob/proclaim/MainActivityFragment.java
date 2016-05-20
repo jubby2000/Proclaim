@@ -2,7 +2,6 @@ package com.example.jacob.proclaim;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,7 +26,6 @@ public class MainActivityFragment extends Fragment {
 
     AToZAdapter mAdapter;
 
-    private SQLiteDatabase database;
     private OnFragmentInteractionListener mListener;
     private ArrayList<Topic> topics;
     Bundle extras;
@@ -65,22 +63,6 @@ public class MainActivityFragment extends Fragment {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
         extras = getArguments();
-        ExternalDbOpenHelper dbOpenHelper = new ExternalDbOpenHelper(this.getContext());
-
-        try {
-            dbOpenHelper.createDataBase();
-        } catch (Exception e) {
-            throw new Error("Unable to create database");
-        }
-
-        try {
-            dbOpenHelper.openDataBase();
-        }catch(android.database.SQLException sqle) {
-            throw sqle;
-        }
-
-        database = dbOpenHelper.getReadableDatabase();
-
 
 
 //        addTopics();
@@ -201,10 +183,19 @@ public class MainActivityFragment extends Fragment {
         Cursor topicCursor;
 
         if (extras != null) {
-            topicCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+            topicCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
+//            topicCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
         } else {
-            topicCursor = database.rawQuery("SELECT " + ExternalDbContract.QuoteEntry.TOPIC +
-                    " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+            String[] projection = new String[]{
+                    ExternalDbContract.QuoteEntry.TOPIC};
+            topicCursor = getContext().getContentResolver()
+                    .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+                            projection,
+                            null,
+                            null,
+                            null);
+//            topicCursor = database.rawQuery("SELECT " + ExternalDbContract.QuoteEntry.TOPIC +
+//                    " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
         }
 
         String firstLetter = "";
@@ -480,12 +471,11 @@ public class MainActivityFragment extends Fragment {
 
             clone = new ArrayList<AToZList>();
             clone.addAll(aToZ);
-            clone.removeAll(Collections.singleton(null));
+            clone.removeAll(Collections.<AToZList>singleton(null));
 
         }
 
         topicCursor.close();
-        database.close();
         return clone;
         }
 //        quoteCursor.close();
@@ -494,26 +484,35 @@ public class MainActivityFragment extends Fragment {
 
 
     private ArrayList<Topic> getTopics(String firstLetter) {
-        Cursor topicCursor = database.rawQuery("SELECT " + ExternalDbContract.QuoteEntry.TOPIC +
-                " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+
+        String[] projection = new String[]{
+                ExternalDbContract.QuoteEntry.TOPIC};
+        Cursor topicCursor = getContext().getContentResolver()
+                .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+                        projection,
+                        null,
+                        null,
+                        null);
 
         ArrayList<Topic> topicsByLetter = new ArrayList<Topic>();
         LinkedHashSet<Topic> tempTopicsByLetter = new LinkedHashSet<Topic>();
 
-        for(topicCursor.moveToFirst(); !topicCursor.isAfterLast(); topicCursor.moveToNext()) {
-            if (topicCursor.getString(0).toUpperCase().substring(0, 1).equals(firstLetter)) {
-                topicsByLetter.add(new Topic(topicCursor.getString(0)));
+        if (topicCursor != null) {
+            for (topicCursor.moveToFirst(); !topicCursor.isAfterLast(); topicCursor.moveToNext()) {
+                if (topicCursor.getString(0).toUpperCase().substring(0, 1).equals(firstLetter)) {
+                    topicsByLetter.add(new Topic(topicCursor.getString(0)));
 //                        Log.v(LOG_TAG, "Duplicate check: " + topicsByLetter.get(0));
 
+                }
             }
-        }
 
-        //Necessary to use a linkedhashset (see above) to not allow duplicate topics and also keep them alphabetical
-        tempTopicsByLetter.addAll(topicsByLetter);
-        topicsByLetter.clear();
-        topicsByLetter.addAll(tempTopicsByLetter);
 
-        //To add a subtext preview below the letter to see topics without actually having to tap
+            //Necessary to use a linkedhashset (see above) to not allow duplicate topics and also keep them alphabetical
+            tempTopicsByLetter.addAll(topicsByLetter);
+            topicsByLetter.clear();
+            topicsByLetter.addAll(tempTopicsByLetter);
+
+            //To add a subtext preview below the letter to see topics without actually having to tap
 //        StringBuilder builder = new StringBuilder();
 //        for (Topic topic : topicsByLetter) {
 //            if(builder.length() != 0) {
@@ -525,49 +524,56 @@ public class MainActivityFragment extends Fragment {
 
 //        mSubText.setText(builder.toString());
 
-        topicCursor.close();
+            topicCursor.close();
+        }
         return topicsByLetter;
     }
 
     private ArrayList<Topic> addAuthors(String firstLetter) {
-        Cursor authorCursor = database.rawQuery("SELECT * FROM " +
-                ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+        Cursor authorCursor = getContext().getContentResolver()
+                .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null);
 
         ArrayList<Topic> authors = new ArrayList<Topic>();
         LinkedHashSet<Topic> tempAuthors = new LinkedHashSet<Topic>();
 
-        for (authorCursor.moveToFirst(); !authorCursor.isAfterLast(); authorCursor.moveToNext()) {
+        if(authorCursor != null) {
+            for (authorCursor.moveToFirst(); !authorCursor.isAfterLast(); authorCursor.moveToNext()) {
 
-            String firstName = authorCursor.getString(1);
-            String lastName = authorCursor.getString(2);
-            String groupName = authorCursor.getString(3);
-            String lastNameFirst = lastName + ", " + firstName;
+                String firstName = authorCursor.getString(1);
+                String lastName = authorCursor.getString(2);
+                String groupName = authorCursor.getString(3);
+                String lastNameFirst = lastName + ", " + firstName;
 
-            //Check to make sure this isn't a group authored quote
-            if (groupName == null) {
-                if (lastName.toUpperCase().substring(0, 1).equals(firstLetter)) {
-                    authors.add(new Topic(lastNameFirst));
-                }
-            } else {
-                //If it is, check that it starts with The and compensate
-                if (groupName.substring(0, 3).equals("The")) {
-                    if (groupName.substring(4, 5).equals(firstLetter)) {
-                        authors.add(new Topic(groupName.substring(4)
-                                + ", " + groupName.substring(0, 3)));
+                //Check to make sure this isn't a group authored quote
+                if (groupName == null) {
+                    if (lastName.toUpperCase().substring(0, 1).equals(firstLetter)) {
+                        authors.add(new Topic(lastNameFirst));
                     }
-
                 } else {
-                    //Otherwise just add the group name
-                    authors.add(new Topic(groupName));
+                    //If it is, check that it starts with The and compensate
+                    if (groupName.substring(0, 3).equals("The")) {
+                        if (groupName.substring(4, 5).equals(firstLetter)) {
+                            authors.add(new Topic(groupName.substring(4)
+                                    + ", " + groupName.substring(0, 3)));
+                        }
+
+                    } else {
+                        //Otherwise just add the group name
+                        authors.add(new Topic(groupName));
+                    }
                 }
             }
+
+            tempAuthors.addAll(authors);
+            authors.clear();
+            authors.addAll(tempAuthors);
+
+            authorCursor.close();
         }
-
-        tempAuthors.addAll(authors);
-        authors.clear();
-        authors.addAll(tempAuthors);
-
-        authorCursor.close();
         return authors;
     }
 

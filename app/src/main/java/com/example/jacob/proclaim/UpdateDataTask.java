@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 /**
  * Created by jacob on 5/18/16.
@@ -15,9 +14,6 @@ public class UpdateDataTask extends AsyncTask<Object, Void, Void> {
     public UpdateDataTask(Context context) {
         this.mContext = context;
     }
-
-    ExternalDbOpenHelper mDbHelper = new ExternalDbOpenHelper(mContext);
-    SQLiteDatabase db;
 
 
 //    private final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
@@ -31,11 +27,8 @@ public class UpdateDataTask extends AsyncTask<Object, Void, Void> {
     @Override
     protected Void doInBackground(Object[] params) {
 
-        if(mContext != null) {
-            Log.v("Context", "it's not null!" + mContext.toString());
-        } else {
-            Log.v("Context", "it's null!");
-        }
+        ExternalDbOpenHelper mDbHelper = new ExternalDbOpenHelper(mContext);;
+        SQLiteDatabase db;
 
         try {
             mDbHelper.createDataBase();

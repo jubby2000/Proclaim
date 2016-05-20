@@ -23,6 +23,7 @@ public class QuoteWidget extends AppWidgetProvider {
 
 //        views.setTextViewText(R.id.appwidget_text, widgetText + "\n\n- " + author + ", " + reference);
 
+
         Intent intent = new Intent(context, QuoteWidgetService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 appWidgetId);

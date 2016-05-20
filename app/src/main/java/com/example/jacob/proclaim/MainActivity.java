@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity
         mBottomBar.noNavBarGoodness();
         mBottomBar.setDefaultTabPosition(1);
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
 

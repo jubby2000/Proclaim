@@ -2,7 +2,6 @@ package com.example.jacob.proclaim;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.support.design.widget.Snackbar;
@@ -25,17 +24,18 @@ public class FavoritesCardViewAdapter extends RecyclerView.Adapter<CardViewHolde
     private final String LOG_TAG = DetailCardViewAdapter.class.getSimpleName();
 
     List<Quote> quotes;
-    Context context;
+    Context mContext;
     String mBold;
     String mItalics;
     String mUnderline;
     String mQuotationMark;
-    ExternalDbOpenHelper mDbHelper;
-    SQLiteDatabase db;
+//    ExternalDbOpenHelper mDbHelper;
+//    SQLiteDatabase db;
 
     ContentValues values = new ContentValues();
 
-    FavoritesCardViewAdapter(List<Quote> quotes) {
+    FavoritesCardViewAdapter(Context context, List<Quote> quotes) {
+        this.mContext = context;
         this.quotes = quotes;
     }
 
@@ -43,26 +43,10 @@ public class FavoritesCardViewAdapter extends RecyclerView.Adapter<CardViewHolde
     public CardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         CardViewHolder cardViewHolder = new CardViewHolder(view);
-        context = parent.getContext();
-        mBold = context.getResources().getString(R.string.format_text_bold);
-        mItalics = context.getResources().getString(R.string.format_text_italics);
-        mUnderline = context.getResources().getString(R.string.format_text_underline);
-        mQuotationMark = context.getResources().getString(R.string.format_text_quotation_mark);
-        mDbHelper = new ExternalDbOpenHelper(context);
-
-        try {
-            mDbHelper.createDataBase();
-        } catch (Exception e) {
-            throw new Error("Unable to create database");
-        }
-
-        try {
-            mDbHelper.openDataBase();
-        }catch(android.database.SQLException sqle) {
-            throw sqle;
-        }
-
-        db = mDbHelper.getWritableDatabase();
+        mBold = mContext.getResources().getString(R.string.format_text_bold);
+        mItalics = mContext.getResources().getString(R.string.format_text_italics);
+        mUnderline = mContext.getResources().getString(R.string.format_text_underline);
+        mQuotationMark = mContext.getResources().getString(R.string.format_text_quotation_mark);
 
         return cardViewHolder;
     }
@@ -102,13 +86,13 @@ public class FavoritesCardViewAdapter extends RecyclerView.Adapter<CardViewHolde
             holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
             holder.mFavorite.getDrawable()
                     .mutate()
-                    .setColorFilter(ContextCompat.getColor(context,
+                    .setColorFilter(ContextCompat.getColor(mContext,
                             R.color.favorite), PorterDuff.Mode.SRC_ATOP);
         } else {
             holder.mFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp);
             holder.mFavorite.getDrawable()
                     .mutate()
-                    .setColorFilter(ContextCompat.getColor(context,
+                    .setColorFilter(ContextCompat.getColor(mContext,
                             R.color.gray), PorterDuff.Mode.SRC_ATOP);
         }
 
@@ -124,8 +108,13 @@ public class FavoritesCardViewAdapter extends RecyclerView.Adapter<CardViewHolde
                                     R.color.gray), PorterDuff.Mode.SRC_ATOP);
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "false");
-                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
-                            + quotes.get(holder.getAdapterPosition()).id, null);
+//                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+//                            + quotes.get(holder.getAdapterPosition()).id, null);
+
+                    UpdateDataTask updateTask =
+                        new UpdateDataTask(mContext);
+                    updateTask.execute(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
+                        + quotes.get(holder.getAdapterPosition()).id, null);
 
                     Snackbar snackbar = Snackbar.make(v, "Removed from your Favorites.", Snackbar.LENGTH_SHORT);
                     snackbar.show();

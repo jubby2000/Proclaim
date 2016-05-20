@@ -1,17 +1,20 @@
 package com.example.jacob.proclaim;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 /**
  * Created by jacob on 5/18/16.
  */
-public class QueryDataTask extends AsyncTask {
+public class QueryDataTask extends AsyncTask<Object, Void, Cursor> {
 
     Context mContext;
-    ExternalDbOpenHelper mDbHelper = new ExternalDbOpenHelper(mContext);
-    SQLiteDatabase db;
+
+    public QueryDataTask(Context context) {
+        this.mContext = context;
+    }
 
 //    private final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
 //
@@ -22,7 +25,10 @@ public class QueryDataTask extends AsyncTask {
 //    }
 
     @Override
-    protected Object doInBackground(Object[] params) {
+    protected Cursor doInBackground(Object[] params) {
+
+        ExternalDbOpenHelper mDbHelper = new ExternalDbOpenHelper(mContext);
+        SQLiteDatabase db;
 
         try {
             mDbHelper.createDataBase();
@@ -38,7 +44,12 @@ public class QueryDataTask extends AsyncTask {
 
         db = mDbHelper.getReadableDatabase();
 
+        String query = (String) params[0];
+        String[] args = (String[]) params[1];
 
-        return null;
+        Cursor cursor = db.rawQuery(query, args);
+        cursor.close();
+
+        return cursor;
     }
 }

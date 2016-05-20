@@ -2,7 +2,6 @@ package com.example.jacob.proclaim;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,7 +28,7 @@ public class DetailActivityFragment extends Fragment {
     final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
-    private SQLiteDatabase database;
+//    private SQLiteDatabase database;
     DetailCardViewAdapter mAdapter;
     private ArrayList<Quote> quotes;
     RecyclerView mRecyclerView;
@@ -52,10 +51,6 @@ public class DetailActivityFragment extends Fragment {
         Log.v(LOG_TAG, "made it to oncreate");
 
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
-
-//        final List<Quote> quotes;
-        ExternalDbOpenHelper dbOpenHelper = new ExternalDbOpenHelper(this.getContext());
-        database = dbOpenHelper.openDataBase();
 
         addQuotes();
 
@@ -126,58 +121,63 @@ public class DetailActivityFragment extends Fragment {
 
     private void addQuotes() {
         quotes = new ArrayList<Quote>();
-        Cursor quoteCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+
+        Cursor quoteCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
+//        QueryDataTask queryTask = new QueryDataTask(this.getContext());
+//        queryTask.execute("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+//        Cursor quoteCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
         String currentTopic = getActivity().getIntent().getStringExtra("Topic");
 
-        quoteCursor.moveToFirst();
-        if(!quoteCursor.isAfterLast()) {
-            do {
-//                long id = quoteCursor.getLong(quoteCursor.getColumnIndex(ExternalDbContract.QuoteEntry.QUOTE_ID));
-                long id = quoteCursor.getLong(0);
-                Log.v(LOG_TAG, String.valueOf(quoteCursor.getInt(0)) + " " + quoteCursor.getString(1));
-                String firstName = quoteCursor.getString(1);
-                String lastName = quoteCursor.getString(2);
-                String groupName = quoteCursor.getString(3);
-                String quote = quoteCursor.getString(4);
-                String topic = quoteCursor.getString(5);
-                String reference = quoteCursor.getString(6);
-                String date = quoteCursor.getString(7);
-                String pageNumber = quoteCursor.getString(8);
-                String popularity = quoteCursor.getString(9);
-                String strFavorite = quoteCursor.getString(10);
-                String userSubmitted = quoteCursor.getString(11);
-                String flagged = quoteCursor.getString(12);
+        if (quoteCursor != null) {
+            quoteCursor.moveToFirst();
+            if (!quoteCursor.isAfterLast()) {
+                do {
+                    //                long id = quoteCursor.getLong(quoteCursor.getColumnIndex(ExternalDbContract.QuoteEntry.QUOTE_ID));
+                    long id = quoteCursor.getLong(0);
+                    Log.v(LOG_TAG, String.valueOf(quoteCursor.getInt(0)) + " " + quoteCursor.getString(1));
+                    String firstName = quoteCursor.getString(1);
+                    String lastName = quoteCursor.getString(2);
+                    String groupName = quoteCursor.getString(3);
+                    String quote = quoteCursor.getString(4);
+                    String topic = quoteCursor.getString(5);
+                    String reference = quoteCursor.getString(6);
+                    String date = quoteCursor.getString(7);
+                    String pageNumber = quoteCursor.getString(8);
+                    String popularity = quoteCursor.getString(9);
+                    String strFavorite = quoteCursor.getString(10);
+                    String userSubmitted = quoteCursor.getString(11);
+                    String flagged = quoteCursor.getString(12);
 
-                boolean favorite = false;
+                    boolean favorite = false;
 
-                if (strFavorite.equals("false")) {
-                    favorite = false;
-                } else if (strFavorite.equals("true")){
-                    favorite = true;
-                }
+                    if (strFavorite.equals("false")) {
+                        favorite = false;
+                    } else if (strFavorite.equals("true")) {
+                        favorite = true;
+                    }
 
-                if (currentTopic == null && favorite) {
-                    quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
-                }
-
-                if (currentTopic != null) {
-                    Log.v(LOG_TAG, "From intent " + currentTopic + firstName + " " + lastName);
-                    if (currentTopic.equals(topic)) {
-                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
-                    } else if (currentTopic.equals(firstName + " " + lastName)){
-                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
-                    } else if (currentTopic.equals(groupName)) {
+                    if (currentTopic == null && favorite) {
                         quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
                     }
-                }
+
+                    if (currentTopic != null) {
+                        Log.v(LOG_TAG, "From intent " + currentTopic + firstName + " " + lastName);
+                        if (currentTopic.equals(topic)) {
+                            quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+                        } else if (currentTopic.equals(firstName + " " + lastName)) {
+                            quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+                        } else if (currentTopic.equals(groupName)) {
+                            quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+                        }
+                    }
 
 
-
-            } while (quoteCursor.moveToNext());
-            quoteCursor.close();
+                } while (quoteCursor.moveToNext());
+                quoteCursor.close();
+            }
         }
 //        quoteCursor.close();
-        database.close();
+//        database.close();
     }
 
 }

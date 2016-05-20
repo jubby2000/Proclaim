@@ -30,8 +30,6 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
     String mItalics;
     String mUnderline;
     String mQuotationMark;
-//    ExternalDbOpenHelper mDbHelper;
-//    SQLiteDatabase db;
 
     ContentValues values = new ContentValues();
 
@@ -45,7 +43,6 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
     public CardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         CardViewHolder cardViewHolder = new CardViewHolder(view);
-//        context = parent.getContext();
         mBold = context.getResources().getString(R.string.format_text_bold);
         mItalics = context.getResources().getString(R.string.format_text_italics);
         mUnderline = context.getResources().getString(R.string.format_text_underline);
@@ -73,25 +70,27 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
     @Override
     public void onBindViewHolder(final CardViewHolder holder, final int position) {
 
-        String authorConcat = quotes.get(position).firstName + " " + quotes.get(position).lastName;
+        String authorConcat = quotes.get(holder.getAdapterPosition()).firstName
+                + " " + quotes.get(holder.getAdapterPosition()).lastName;
         String sourceConcat;
 
         //Check if a date exists, and if it does append it to the reference, if not, don't.
-        if (quotes.get(position).date != null){
-            sourceConcat = quotes.get(position).reference + ", " + quotes.get(position).date;
+        if (quotes.get(holder.getAdapterPosition()).date != null){
+            sourceConcat = quotes.get(holder.getAdapterPosition()).reference
+                    + ", " + quotes.get(holder.getAdapterPosition()).date;
         } else {
-            sourceConcat = quotes.get(position).reference;
+            sourceConcat = quotes.get(holder.getAdapterPosition()).reference;
         }
 
         //Check if a group author name exists, it it does use it, otherwise, use the concatenated author first and last name.
-        if (quotes.get(position).groupName != null) {
-            holder.mAuthorView.setText(quotes.get(position).groupName);
+        if (quotes.get(holder.getAdapterPosition()).groupName != null) {
+            holder.mAuthorView.setText(quotes.get(holder.getAdapterPosition()).groupName);
         } else {
             holder.mAuthorView.setText(authorConcat);
         }
 
         // To remove special characters in the quoted text that were inserted to format the text at this stage.
-        CharSequence text = quotes.get(position).quote.replace(mQuotationMark, "\"");
+        CharSequence text = quotes.get(holder.getAdapterPosition()).quote.replace(mQuotationMark, "\"");
 
         text = setSpanBetweenTokens(text, mBold);
         text = setSpanBetweenTokens(text, mItalics);
@@ -101,7 +100,7 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
         holder.mReferenceView.setText(sourceConcat);
 
         //Set image as Favorite if already exists in the database
-        if (quotes.get(position).favorite) {
+        if (quotes.get(holder.getAdapterPosition()).favorite) {
             holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
             holder.mFavorite.getDrawable()
                     .mutate()
@@ -119,7 +118,7 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
         holder.mFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!quotes.get(position).favorite) {
+                if (!quotes.get(holder.getAdapterPosition()).favorite) {
                     holder.mFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
                     holder.mFavorite.getDrawable()
                             .mutate()
@@ -131,17 +130,17 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
                     UpdateDataTask updateTask =
                             new UpdateDataTask(context);
                     updateTask.execute(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
-                            + quotes.get(position).id, null);
+                            + quotes.get(holder.getAdapterPosition()).id, null);
 
 //                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
 //                            + quotes.get(position).id, null);
 
-                    Log.v(LOG_TAG, "SQL id position: " + quotes.get(position).id);
+                    Log.v(LOG_TAG, "SQL id position: " + quotes.get(holder.getAdapterPosition()).id);
 
                     Snackbar snackbar = Snackbar.make(v, "Added to your Favorites.", Snackbar.LENGTH_SHORT);
                     snackbar.show();
 
-                    quotes.get(position).favorite = true;
+                    quotes.get(holder.getAdapterPosition()).favorite = true;
 //                    addItem(position);
                     notifyDataSetChanged();
                 } else {
@@ -156,7 +155,7 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
                     UpdateDataTask updateTask =
                             new UpdateDataTask(v.getContext());
                     updateTask.execute(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
-                            + quotes.get(position).id, null);
+                            + quotes.get(holder.getAdapterPosition()).id, null);
 
 //                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
 //                            + quotes.get(position).id, null);
@@ -164,7 +163,7 @@ public class DetailCardViewAdapter extends RecyclerView.Adapter<CardViewHolder> 
                     Snackbar snackbar = Snackbar.make(v, "Removed from your Favorites.", Snackbar.LENGTH_SHORT);
                     snackbar.show();
 
-                    quotes.get(position).favorite = false;
+                    quotes.get(holder.getAdapterPosition()).favorite = false;
 //                    removeItem(position);
                     notifyDataSetChanged();
                 }

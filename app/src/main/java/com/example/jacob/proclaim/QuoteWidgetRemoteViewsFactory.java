@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -30,7 +29,6 @@ public class QuoteWidgetRemoteViewsFactory implements RemoteViewsService.RemoteV
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         Log.d("AppWidgetId", String.valueOf(appWidgetId));
-        dbhelper = new ExternalDbOpenHelper(this.context);
         populateListItem();
     }
 
@@ -42,9 +40,6 @@ public class QuoteWidgetRemoteViewsFactory implements RemoteViewsService.RemoteV
         String mUnderline = context.getResources().getString(R.string.format_text_underline);
         String mQuotationMark = context.getResources().getString(R.string.format_text_quotation_mark);
 
-        dbhelper = new ExternalDbOpenHelper(context);
-        SQLiteDatabase db = dbhelper.getReadableDatabase();
-
         String first = "";
         String last = "";
         String group = "";
@@ -52,34 +47,44 @@ public class QuoteWidgetRemoteViewsFactory implements RemoteViewsService.RemoteV
         String quote = "";
         String reference = "";
 
-        Cursor cursor = db.rawQuery("SELECT " + ExternalDbContract.QuoteEntry._ID
-                + ", \"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME
-                + "\", \"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME
-                + "\", \"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME
-                + "\", " + ExternalDbContract.QuoteEntry.TOPIC
-                + ", " + ExternalDbContract.QuoteEntry.QUOTE
-                + ", " + ExternalDbContract.QuoteEntry.REFERENCE
-                + " FROM quotes ORDER BY RANDOM() LIMIT 1", null);
+        String[] projection = new String[] {
+                ExternalDbContract.QuoteEntry._ID,
+                "\"" + ExternalDbContract.QuoteEntry.AUTHOR_FIRST_NAME + "\"",
+                "\"" + ExternalDbContract.QuoteEntry.AUTHOR_LAST_NAME + "\"",
+                "\"" + ExternalDbContract.QuoteEntry.AUTHOR_GROUP_NAME + "\"",
+                ExternalDbContract.QuoteEntry.TOPIC,
+                ExternalDbContract.QuoteEntry.QUOTE,
+                ExternalDbContract.QuoteEntry.REFERENCE
+        };
 
-        if (cursor.moveToFirst()) {
-            do {
-                long id = cursor.getLong(0);
-                first = cursor.getString(1);
-                last = cursor.getString(2);
-                group = cursor.getString(3);
-                topic = cursor.getString(4);
-                quote = cursor.getString(5);
-                reference = cursor.getString(6);
+        String sortOrder = "RANDOM() LIMIT 1";
+
+        Cursor cursor = context.getContentResolver().query(
+                ExternalDbContract.QuoteEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                sortOrder);
+
+        if(cursor != null) {
+
+
+            if (cursor.moveToFirst()) {
+                do {
+                    long id = cursor.getLong(0);
+                    first = cursor.getString(1);
+                    last = cursor.getString(2);
+                    group = cursor.getString(3);
+                    topic = cursor.getString(4);
+                    quote = cursor.getString(5);
+                    reference = cursor.getString(6);
 //                Log.v(LOG_TAG, "First: " + first + ". Last: " + last + ". Group: " + group + ". Quote: " + quote + ". And topic is: " + topic);
-            } while (cursor.moveToNext());
+                } while (cursor.moveToNext());
+            }
+
+
+            cursor.close();
         }
-
-
-
-        cursor.close();
-        db.close();
-
-
 
         String author = "";
         if (group == null) {
