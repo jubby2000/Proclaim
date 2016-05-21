@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,13 +26,14 @@ import java.util.ArrayList;
  * Use the {@link DetailActivityFragment#} factory method to
  * create an instance of this fragment.
  */
-public class DetailActivityFragment extends Fragment {
+public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
 //    private SQLiteDatabase database;
     DetailCardViewAdapter mAdapter;
+    private static final int LOADER = 0;
     private ArrayList<Quote> quotes;
     RecyclerView mRecyclerView;
 
@@ -52,15 +56,15 @@ public class DetailActivityFragment extends Fragment {
 
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        addQuotes();
+//        addQuotes();
 
-        mAdapter = new DetailCardViewAdapter(this.getContext(), quotes);
-//        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
+        Bundle args = new Bundle();
+        args.putString("uri", ExternalDbContract.QuoteEntry.CONTENT_URI.toString());
+        getLoaderManager().initLoader(LOADER, args, this);
 
-//        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(mAdapter);
+
+
 
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -92,37 +96,34 @@ public class DetailActivityFragment extends Fragment {
         mListener = null;
     }
 
-//    @Override
-//    public void onHiddenChanged(boolean hidden) {
-////        if (!hidden) {
-////            Log.v(LOG_TAG, "I'm at onHidden!");
-////            addQuotes();
-////
-////        }
-//        if (!hidden) {
-//
-//        }
-//    }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        Uri uri = Uri.parse(args.getString("uri"));
+
+        switch (id) {
+            case LOADER:
+                // Returns a new CursorLoader
+                return new CursorLoader(
+                        getActivity(),   // Parent activity context
+                        uri,        // Uri to query
+                        null,     // Projection to return (all columns)
+                        null,            // No selection clause
+                        null,            // No selection arguments
+                        null             // Default sort order
+                );
+            default:
+                // An invalid id was passed in
+                return null;
+        }
     }
 
-    private void addQuotes() {
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor quoteCursor) {
+
         quotes = new ArrayList<Quote>();
 
-        Cursor quoteCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
+//        Cursor quoteCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
 //        QueryDataTask queryTask = new QueryDataTask(this.getContext());
 //        queryTask.execute("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
 //        Cursor quoteCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
@@ -175,9 +176,109 @@ public class DetailActivityFragment extends Fragment {
                 } while (quoteCursor.moveToNext());
                 quoteCursor.close();
             }
+            mAdapter = new DetailCardViewAdapter(this.getContext(), quotes);
+//        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
+
+//        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            mRecyclerView.setAdapter(mAdapter);
         }
 //        quoteCursor.close();
 //        database.close();
     }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+////        if (!hidden) {
+////            Log.v(LOG_TAG, "I'm at onHidden!");
+////            addQuotes();
+////
+////        }
+//        if (!hidden) {
+//
+//        }
+//    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+//    private void addQuotes() {
+//        quotes = new ArrayList<Quote>();
+//
+//        Cursor quoteCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
+////        QueryDataTask queryTask = new QueryDataTask(this.getContext());
+////        queryTask.execute("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+////        Cursor quoteCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
+//        String currentTopic = getActivity().getIntent().getStringExtra("Topic");
+//
+//        if (quoteCursor != null) {
+//            quoteCursor.moveToFirst();
+//            if (!quoteCursor.isAfterLast()) {
+//                do {
+//                    //                long id = quoteCursor.getLong(quoteCursor.getColumnIndex(ExternalDbContract.QuoteEntry.QUOTE_ID));
+//                    long id = quoteCursor.getLong(0);
+//                    Log.v(LOG_TAG, String.valueOf(quoteCursor.getInt(0)) + " " + quoteCursor.getString(1));
+//                    String firstName = quoteCursor.getString(1);
+//                    String lastName = quoteCursor.getString(2);
+//                    String groupName = quoteCursor.getString(3);
+//                    String quote = quoteCursor.getString(4);
+//                    String topic = quoteCursor.getString(5);
+//                    String reference = quoteCursor.getString(6);
+//                    String date = quoteCursor.getString(7);
+//                    String pageNumber = quoteCursor.getString(8);
+//                    String popularity = quoteCursor.getString(9);
+//                    String strFavorite = quoteCursor.getString(10);
+//                    String userSubmitted = quoteCursor.getString(11);
+//                    String flagged = quoteCursor.getString(12);
+//
+//                    boolean favorite = false;
+//
+//                    if (strFavorite.equals("false")) {
+//                        favorite = false;
+//                    } else if (strFavorite.equals("true")) {
+//                        favorite = true;
+//                    }
+//
+//                    if (currentTopic == null && favorite) {
+//                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+//                    }
+//
+//                    if (currentTopic != null) {
+//                        Log.v(LOG_TAG, "From intent " + currentTopic + firstName + " " + lastName);
+//                        if (currentTopic.equals(topic)) {
+//                            quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+//                        } else if (currentTopic.equals(firstName + " " + lastName)) {
+//                            quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+//                        } else if (currentTopic.equals(groupName)) {
+//                            quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
+//                        }
+//                    }
+//
+//
+//                } while (quoteCursor.moveToNext());
+//                quoteCursor.close();
+//            }
+//        }
+////        quoteCursor.close();
+////        database.close();
+//    }
 
 }

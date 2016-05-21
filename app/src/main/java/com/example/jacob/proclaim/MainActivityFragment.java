@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,9 +23,14 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+
     private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
+
+    private static final int PARENT_LOADER = 0;
+    private static final int CHILD_LOADER = 1;
+    private static final int AUTHOR_LOADER = 2;
 
     AToZAdapter mAdapter;
 
@@ -49,12 +57,6 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
     }
 
     @Override
@@ -64,61 +66,16 @@ public class MainActivityFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
         extras = getArguments();
 
-
-//        addTopics();
-
-//        Topic atonement = new Topic("Atonement");
-//        Topic abrahamicCovenant = new Topic("Abrahamic Covenant");
-//        Topic adam = new Topic("Adam");
-//
-//        Topic baptism = new Topic("Baptism");
-//        Topic bethlehem = new Topic("Bethlehem");
-//        Topic bethesda = new Topic("Bethesda");
-//
-//        AToZList A = new AToZList("A", Arrays.asList(adam, abrahamicCovenant, atonement));
-//        AToZList B = new AToZList("B", Arrays.asList(baptism, bethesda, bethlehem));
-//        final List<AToZList> aToZ = Arrays.asList(A, B);
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.topic_list);
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-//        recyclerView.setLayoutManager(layoutManager);
-//
-//        Log.v(LOG_TAG, String.valueOf(recyclerView.findContainingItemView(getContext())));
 
-        SimpleDividerItemDecoration dividerItemDecoration =
-                new SimpleDividerItemDecoration(getContext());
+//        SimpleDividerItemDecoration dividerItemDecoration =
+//                new SimpleDividerItemDecoration(getContext());
 
-//        LayoutTransition lt = new LayoutTransition();
-//        lt.disableTransitionType(LayoutTransition.DISAPPEARING);
-//        recyclerView.setLayoutTransition(lt);
+        final List<AToZList> mAToZ;
 
-//        recyclerView.addItemDecoration(dividerItemDecoration);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        final List<AToZList> aToZ;
-
-        aToZ = addTopics();
-
-        mAdapter = new AToZAdapter(getContext(), aToZ);
-
-        mAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
-            @Override
-            public void onListItemExpanded(int position) {
-                AToZList expandedList = aToZ.get(position);
-                //view.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.GONE);
-                Log.v(LOG_TAG, String.valueOf(position));
-            }
-
-            @Override
-            public void onListItemCollapsed(int position) {
-                AToZList collapsedList = aToZ.get(position);
-                //view.findViewById(R.id.a_to_z_list_sub_text).setVisibility(View.VISIBLE);
-            }
-        });
-
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(mAdapter);
+        Bundle args = new Bundle();
+        args.putString("uri", ExternalDbContract.QuoteEntry.CONTENT_URI.toString());
+        getLoaderManager().initLoader(PARENT_LOADER, args, this);
 
         return view;
     }
@@ -158,6 +115,450 @@ public class MainActivityFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        Uri uri = Uri.parse(args.getString("uri"));
+
+        switch (id) {
+            case PARENT_LOADER:
+                if(extras == null) {
+                // Returns a new CursorLoader
+                    return new CursorLoader(
+                            getActivity(),   // Parent activity context
+                            uri,        // Uri to query
+                            new String[]{ExternalDbContract.QuoteEntry.TOPIC},     // Projection to return (topics column)
+                            null,            // No selection clause
+                            null,            // No selection arguments
+                            null             // Default sort order
+                    );
+                } else {
+                    return new CursorLoader(
+                            getActivity(),   // Parent activity context
+                            uri,        // Uri to query
+                            null,     // Projection to return (all columns)
+                            null,            // No selection clause
+                            null,            // No selection arguments
+                            null             // Default sort order
+                    );
+                }
+            case CHILD_LOADER:
+                return new CursorLoader(
+                        getActivity(),
+                        uri,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            case AUTHOR_LOADER:
+                return new CursorLoader(
+                        getActivity(),
+                        uri,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+
+            default:
+                // An invalid id was passed in
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
+        switch (loader.getId()) {
+            case PARENT_LOADER:
+                topics = new ArrayList<Topic>();
+                List<AToZList> aToZ;
+                final ArrayList<AToZList> clone;
+                Cursor dupCursor;
+                AToZList A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
+                A=B=C=D=E=F=G=H=I=J=K=L=M=N=O=P=Q=R=S=T=U=V=W=X=Y=Z = null;
+
+//                if (extras != null) {
+//                    cursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
+                dupCursor = cursor;
+//                } else {
+//                    String[] projection = new String[]{
+//                            ExternalDbContract.QuoteEntry.TOPIC};
+//                    cursor = getContext().getContentResolver()
+//                            .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+//                                    projection,
+//                                    null,
+//                                    null,
+//                                    null);
+//                    dupCursor = cursor;
+//                }
+
+                String firstLetter = "";
+
+
+                try {
+                    for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                        int currentPosition = cursor.getPosition();
+                        //In this scenario, Authors was no clicked, thus the assignment will be to topics
+                        //The topicCursor will be iterating through the topics column
+                        if (extras == null) {
+                            firstLetter = cursor.getString(0).toUpperCase().substring(0, 1);
+
+                            //Else, getArguments isn't empty, which means we now need to know how to deal with Authors
+                            //Check if group name is empty
+                        } else if (cursor.getString(3) == null) {
+                            firstLetter = cursor.getString(2).toUpperCase().substring(0, 1);
+                            Log.v(LOG_TAG, cursor.getString(2) + " " + firstLetter);
+
+                            //Check if group name starts with The, and exclude it from firstLetter selection
+                        } else if (cursor.getString(3).substring(0, 3).equals("The")) {
+                            firstLetter = cursor.getString(3).substring(4, 5);
+                            Log.v(LOG_TAG, cursor.getString(3) + " " + firstLetter);
+                        }
+
+                        switch (firstLetter) {
+                            case "A":
+                                if(A == null) {
+                                    if (extras == null) {
+                                        A = new AToZList("A", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        A = new AToZList("A", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+
+                                    //subText.setText(A.getChildItemList());
+                                    //aToZ.add(A);
+                                }
+                                break;
+                            case "B":
+                                if(B == null) {
+                                    if (extras == null) {
+                                        B = new AToZList("B", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        B = new AToZList("B", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                    //aToZ.add(B);
+                                }
+                                break;
+                            case "C":
+                                if(C == null) {
+                                    if (extras == null) {
+                                        C = new AToZList("C", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        C = new AToZList("C", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "D":
+                                if(D == null) {
+                                    if (extras == null) {
+                                        D = new AToZList("D", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        D = new AToZList("D", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "E":
+                                if(E == null) {
+                                    if (extras == null) {
+                                        E = new AToZList("E", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        E = new AToZList("E", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "F":
+                                if(F == null) {
+                                    if (extras == null) {
+                                        F = new AToZList("F", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        F = new AToZList("F", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "G":
+                                if(G == null) {
+                                    if (extras == null) {
+                                        G = new AToZList("G", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        G = new AToZList("G", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "H":
+                                if(H == null) {
+                                    if (extras == null) {
+                                        H = new AToZList("H", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        H = new AToZList("H", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "I":
+                                if(I == null) {
+                                    if (extras == null) {
+                                        I = new AToZList("I", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        I = new AToZList("I", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "J":
+                                if(J == null) {
+                                    if (extras == null) {
+                                        J = new AToZList("J", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        J = new AToZList("J", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "K":
+                                if(K == null) {
+                                    if (extras == null) {
+                                        K = new AToZList("K", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        K = new AToZList("K", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "L":
+                                if(L == null) {
+                                    if (extras == null) {
+                                        L = new AToZList("L", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        L = new AToZList("L", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "M":
+                                if(M == null) {
+                                    if (extras == null) {
+                                        M = new AToZList("M", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        M = new AToZList("M", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "N":
+                                if(N == null) {
+                                    if (extras == null) {
+                                        N = new AToZList("N", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        N = new AToZList("N", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "O":
+                                if(O == null) {
+                                    if (extras == null) {
+                                        O = new AToZList("O", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        O = new AToZList("O", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "P":
+                                if(P == null) {
+                                    if (extras == null) {
+                                        P = new AToZList("P", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        P = new AToZList("P", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "Q":
+                                if(Q == null) {
+                                    if (extras == null) {
+                                        Q = new AToZList("Q", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        Q = new AToZList("Q", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "R":
+                                if(R == null) {
+                                    if (extras == null) {
+                                        R = new AToZList("R", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        R = new AToZList("R", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "S":
+                                if(S == null) {
+                                    if (extras == null) {
+                                        S = new AToZList("S", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        S = new AToZList("S", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "T":
+                                if(T == null) {
+                                    if (extras == null) {
+                                        T = new AToZList("T", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        T = new AToZList("T", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "U":
+                                if(U == null) {
+                                    if (extras == null) {
+                                        U = new AToZList("U", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        U = new AToZList("U", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "V":
+                                if(V == null) {
+                                    if (extras == null) {
+                                        V = new AToZList("V", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        V = new AToZList("V", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "W":
+                                if(W == null) {
+                                    if (extras == null) {
+                                        W = new AToZList("W", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        W = new AToZList("W", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "X":
+                                if(X == null) {
+                                    if (extras == null) {
+                                        X = new AToZList("X", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        X = new AToZList("X", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "Y":
+                                if(Y == null) {
+                                    if (extras == null) {
+                                        Y = new AToZList("Y", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        Y = new AToZList("Y", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+                            case "Z":
+                                if(Z == null) {
+                                    if (extras == null) {
+                                        Z = new AToZList("Z", getTopics(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    } else {
+                                        Z = new AToZList("Z", addAuthors(dupCursor, firstLetter));
+                                        cursor.moveToPosition(currentPosition);
+                                    }
+                                }
+                                break;
+
+                        }
+                    }
+                }finally {
+                    Log.v(LOG_TAG, "I got to the finally block!");
+                    aToZ = Arrays.asList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
+
+                    //TODO convert this to a mutable list to remove nulls
+
+//            aToZ.removeAll(Collections.singleton(null));
+
+                    clone = new ArrayList<AToZList>();
+                    clone.addAll(aToZ);
+                    clone.removeAll(Collections.<AToZList>singleton(null));
+
+                }
+
+                cursor.close();
+
+                mAdapter = new AToZAdapter(getContext(), clone);
+
+                mAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
+                    @Override
+                    public void onListItemExpanded(int position) {
+                        AToZList expandedList = clone.get(position);
+                    }
+
+                    @Override
+                    public void onListItemCollapsed(int position) {
+                        AToZList collapsedList = clone.get(position);
+                    }
+                });
+
+
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                mRecyclerView.setAdapter(mAdapter);
+
+            case CHILD_LOADER:
+
+        }
+
+
+    }
+
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -173,369 +574,352 @@ public class MainActivityFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private List<AToZList> addTopics() {
-        topics = new ArrayList<Topic>();
-        List<AToZList> aToZ;
-        ArrayList<AToZList> clone;
-        AToZList A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
-        A=B=C=D=E=F=G=H=I=J=K=L=M=N=O=P=Q=R=S=T=U=V=W=X=Y=Z = null;
-
-        Cursor topicCursor;
-
-        if (extras != null) {
-            topicCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
-//            topicCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
-        } else {
-            String[] projection = new String[]{
-                    ExternalDbContract.QuoteEntry.TOPIC};
-            topicCursor = getContext().getContentResolver()
-                    .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
-                            projection,
-                            null,
-                            null,
-                            null);
-//            topicCursor = database.rawQuery("SELECT " + ExternalDbContract.QuoteEntry.TOPIC +
-//                    " FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
-        }
-
-        String firstLetter = "";
-
-        try {
-            for (topicCursor.moveToFirst(); !topicCursor.isAfterLast(); topicCursor.moveToNext()) {
-                //In this scenario, Authors was no clicked, thus the assignment will be to topics
-                //The topicCursor will be iterating through the topics column
-                if (extras == null) {
-                    firstLetter = topicCursor.getString(0).toUpperCase().substring(0, 1);
-
-                //Else, getArguments isn't empty, which means we now need to know how to deal with Authors
-                //Check if group name is empty
-                } else if (topicCursor.getString(3) == null) {
-                        firstLetter = topicCursor.getString(2).toUpperCase().substring(0, 1);
-                    Log.v(LOG_TAG, topicCursor.getString(2) + " " + firstLetter);
-
-                //Check if group name starts with The, and exclude it from firstLetter selection
-                    } else if (topicCursor.getString(3).substring(0, 3).equals("The")) {
-                        firstLetter = topicCursor.getString(3).substring(4, 5);
-                    Log.v(LOG_TAG, topicCursor.getString(3) + " " + firstLetter);
-                }
-
-                switch (firstLetter) {
-                    case "A":
-                        if(A == null) {
-                            if (extras == null) {
-                                A = new AToZList("A", getTopics(firstLetter));
-                            } else {
-                                A = new AToZList("A", addAuthors(firstLetter));
-                            }
-
-                            //subText.setText(A.getChildItemList());
-                            //aToZ.add(A);
-                        }
-                        break;
-                    case "B":
-                        if(B == null) {
-                            if (extras == null) {
-                                B = new AToZList("B", getTopics(firstLetter));
-                            } else {
-                                B = new AToZList("B", addAuthors(firstLetter));
-                            }
-                            //aToZ.add(B);
-                        }
-                        break;
-                    case "C":
-                        if(C == null) {
-                            if (extras == null) {
-                                C = new AToZList("C", getTopics(firstLetter));
-                            } else {
-                                C = new AToZList("C", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "D":
-                        if(D == null) {
-                            if (extras == null) {
-                                D = new AToZList("D", getTopics(firstLetter));
-                            } else {
-                                D = new AToZList("D", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "E":
-                        if(E == null) {
-                            if (extras == null) {
-                                E = new AToZList("E", getTopics(firstLetter));
-                            } else {
-                                E = new AToZList("E", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "F":
-                        if(F == null) {
-                            if (extras == null) {
-                                F = new AToZList("F", getTopics(firstLetter));
-                            } else {
-                                F = new AToZList("F", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "G":
-                        if(G == null) {
-                            if (extras == null) {
-                                G = new AToZList("G", getTopics(firstLetter));
-                            } else {
-                                G = new AToZList("G", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "H":
-                        if(H == null) {
-                            if (extras == null) {
-                                H = new AToZList("H", getTopics(firstLetter));
-                            } else {
-                                H = new AToZList("H", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "I":
-                        if(I == null) {
-                            if (extras == null) {
-                                I = new AToZList("I", getTopics(firstLetter));
-                            } else {
-                                I = new AToZList("I", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "J":
-                        if(J == null) {
-                            if (extras == null) {
-                                J = new AToZList("J", getTopics(firstLetter));
-                            } else {
-                                J = new AToZList("J", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "K":
-                        if(K == null) {
-                            if (extras == null) {
-                                K = new AToZList("K", getTopics(firstLetter));
-                            } else {
-                                K = new AToZList("K", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "L":
-                        if(L == null) {
-                            if (extras == null) {
-                                L = new AToZList("L", getTopics(firstLetter));
-                            } else {
-                                L = new AToZList("L", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "M":
-                        if(M == null) {
-                            if (extras == null) {
-                                M = new AToZList("M", getTopics(firstLetter));
-                            } else {
-                                M = new AToZList("M", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "N":
-                        if(N == null) {
-                            if (extras == null) {
-                                N = new AToZList("N", getTopics(firstLetter));
-                            } else {
-                                N = new AToZList("N", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "O":
-                        if(O == null) {
-                            if (extras == null) {
-                                O = new AToZList("O", getTopics(firstLetter));
-                            } else {
-                                O = new AToZList("O", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "P":
-                        if(P == null) {
-                            if (extras == null) {
-                                P = new AToZList("P", getTopics(firstLetter));
-                            } else {
-                                P = new AToZList("P", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "Q":
-                        if(Q == null) {
-                            if (extras == null) {
-                                Q = new AToZList("Q", getTopics(firstLetter));
-                            } else {
-                                Q = new AToZList("Q", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "R":
-                        if(R == null) {
-                            if (extras == null) {
-                                R = new AToZList("R", getTopics(firstLetter));
-                            } else {
-                                R = new AToZList("R", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "S":
-                        if(S == null) {
-                            if (extras == null) {
-                                S = new AToZList("S", getTopics(firstLetter));
-                            } else {
-                                S = new AToZList("S", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "T":
-                        if(T == null) {
-                            if (extras == null) {
-                                T = new AToZList("T", getTopics(firstLetter));
-                            } else {
-                                T = new AToZList("T", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "U":
-                        if(U == null) {
-                            if (extras == null) {
-                                U = new AToZList("U", getTopics(firstLetter));
-                            } else {
-                                U = new AToZList("U", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "V":
-                        if(V == null) {
-                            if (extras == null) {
-                                V = new AToZList("V", getTopics(firstLetter));
-                            } else {
-                                V = new AToZList("V", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "W":
-                        if(W == null) {
-                            if (extras == null) {
-                                W = new AToZList("W", getTopics(firstLetter));
-                            } else {
-                                W = new AToZList("W", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "X":
-                        if(X == null) {
-                            if (extras == null) {
-                                X = new AToZList("X", getTopics(firstLetter));
-                            } else {
-                                X = new AToZList("X", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "Y":
-                        if(Y == null) {
-                            if (extras == null) {
-                                Y = new AToZList("Y", getTopics(firstLetter));
-                            } else {
-                                Y = new AToZList("Y", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-                    case "Z":
-                        if(Z == null) {
-                            if (extras == null) {
-                                Z = new AToZList("Z", getTopics(firstLetter));
-                            } else {
-                                Z = new AToZList("Z", addAuthors(firstLetter));
-                            }
-                        }
-                        break;
-
-                }
-            }
-        }finally {
-            Log.v(LOG_TAG, "I got to the finally block!");
-            aToZ = Arrays.asList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
-
-            //TODO convert this to a mutable list to remove nulls
-
-//            aToZ.removeAll(Collections.singleton(null));
-
-            clone = new ArrayList<AToZList>();
-            clone.addAll(aToZ);
-            clone.removeAll(Collections.<AToZList>singleton(null));
-
-        }
-
-        topicCursor.close();
-        return clone;
-        }
-//        quoteCursor.close();
+//    private List<AToZList> addTopics() {
+//        topics = new ArrayList<Topic>();
+//        List<AToZList> aToZ;
+//        ArrayList<AToZList> clone;
+//        AToZList A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
+//        A=B=C=D=E=F=G=H=I=J=K=L=M=N=O=P=Q=R=S=T=U=V=W=X=Y=Z = null;
+//
+//        Cursor parentTopicCursor;
+//
+//        if (extras != null) {
+//            parentTopicCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
+//        } else {
+//            String[] projection = new String[]{
+//                    ExternalDbContract.QuoteEntry.TOPIC};
+//            parentTopicCursor = getContext().getContentResolver()
+//                    .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+//                            projection,
+//                            null,
+//                            null,
+//                            null);
+//        }
+//
+//        String firstLetter = "";
+//
+//        try {
+//            for (parentTopicCursor.moveToFirst(); !parentTopicCursor.isAfterLast(); parentTopicCursor.moveToNext()) {
+//                //In this scenario, Authors was no clicked, thus the assignment will be to topics
+//                //The topicCursor will be iterating through the topics column
+//                if (extras == null) {
+//                    firstLetter = parentTopicCursor.getString(0).toUpperCase().substring(0, 1);
+//
+//                //Else, getArguments isn't empty, which means we now need to know how to deal with Authors
+//                //Check if group name is empty
+//                } else if (parentTopicCursor.getString(3) == null) {
+//                        firstLetter = parentTopicCursor.getString(2).toUpperCase().substring(0, 1);
+//                    Log.v(LOG_TAG, parentTopicCursor.getString(2) + " " + firstLetter);
+//
+//                //Check if group name starts with The, and exclude it from firstLetter selection
+//                    } else if (parentTopicCursor.getString(3).substring(0, 3).equals("The")) {
+//                        firstLetter = parentTopicCursor.getString(3).substring(4, 5);
+//                    Log.v(LOG_TAG, parentTopicCursor.getString(3) + " " + firstLetter);
+//                }
+//
+//                switch (firstLetter) {
+//                    case "A":
+//                        if(A == null) {
+//                            if (extras == null) {
+//                                A = new AToZList("A", getTopics(firstLetter));
+//                            } else {
+//                                A = new AToZList("A", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "B":
+//                        if(B == null) {
+//                            if (extras == null) {
+//                                B = new AToZList("B", getTopics(firstLetter));
+//                            } else {
+//                                B = new AToZList("B", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "C":
+//                        if(C == null) {
+//                            if (extras == null) {
+//                                C = new AToZList("C", getTopics(firstLetter));
+//                            } else {
+//                                C = new AToZList("C", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "D":
+//                        if(D == null) {
+//                            if (extras == null) {
+//                                D = new AToZList("D", getTopics(firstLetter));
+//                            } else {
+//                                D = new AToZList("D", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "E":
+//                        if(E == null) {
+//                            if (extras == null) {
+//                                E = new AToZList("E", getTopics(firstLetter));
+//                            } else {
+//                                E = new AToZList("E", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "F":
+//                        if(F == null) {
+//                            if (extras == null) {
+//                                F = new AToZList("F", getTopics(firstLetter));
+//                            } else {
+//                                F = new AToZList("F", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "G":
+//                        if(G == null) {
+//                            if (extras == null) {
+//                                G = new AToZList("G", getTopics(firstLetter));
+//                            } else {
+//                                G = new AToZList("G", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "H":
+//                        if(H == null) {
+//                            if (extras == null) {
+//                                H = new AToZList("H", getTopics(firstLetter));
+//                            } else {
+//                                H = new AToZList("H", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "I":
+//                        if(I == null) {
+//                            if (extras == null) {
+//                                I = new AToZList("I", getTopics(firstLetter));
+//                            } else {
+//                                I = new AToZList("I", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "J":
+//                        if(J == null) {
+//                            if (extras == null) {
+//                                J = new AToZList("J", getTopics(firstLetter));
+//                            } else {
+//                                J = new AToZList("J", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "K":
+//                        if(K == null) {
+//                            if (extras == null) {
+//                                K = new AToZList("K", getTopics(firstLetter));
+//                            } else {
+//                                K = new AToZList("K", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "L":
+//                        if(L == null) {
+//                            if (extras == null) {
+//                                L = new AToZList("L", getTopics(firstLetter));
+//                            } else {
+//                                L = new AToZList("L", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "M":
+//                        if(M == null) {
+//                            if (extras == null) {
+//                                M = new AToZList("M", getTopics(firstLetter));
+//                            } else {
+//                                M = new AToZList("M", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "N":
+//                        if(N == null) {
+//                            if (extras == null) {
+//                                N = new AToZList("N", getTopics(firstLetter));
+//                            } else {
+//                                N = new AToZList("N", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "O":
+//                        if(O == null) {
+//                            if (extras == null) {
+//                                O = new AToZList("O", getTopics(firstLetter));
+//                            } else {
+//                                O = new AToZList("O", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "P":
+//                        if(P == null) {
+//                            if (extras == null) {
+//                                P = new AToZList("P", getTopics(firstLetter));
+//                            } else {
+//                                P = new AToZList("P", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "Q":
+//                        if(Q == null) {
+//                            if (extras == null) {
+//                                Q = new AToZList("Q", getTopics(firstLetter));
+//                            } else {
+//                                Q = new AToZList("Q", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "R":
+//                        if(R == null) {
+//                            if (extras == null) {
+//                                R = new AToZList("R", getTopics(firstLetter));
+//                            } else {
+//                                R = new AToZList("R", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "S":
+//                        if(S == null) {
+//                            if (extras == null) {
+//                                S = new AToZList("S", getTopics(firstLetter));
+//                            } else {
+//                                S = new AToZList("S", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "T":
+//                        if(T == null) {
+//                            if (extras == null) {
+//                                T = new AToZList("T", getTopics(firstLetter));
+//                            } else {
+//                                T = new AToZList("T", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "U":
+//                        if(U == null) {
+//                            if (extras == null) {
+//                                U = new AToZList("U", getTopics(firstLetter));
+//                            } else {
+//                                U = new AToZList("U", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "V":
+//                        if(V == null) {
+//                            if (extras == null) {
+//                                V = new AToZList("V", getTopics(firstLetter));
+//                            } else {
+//                                V = new AToZList("V", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "W":
+//                        if(W == null) {
+//                            if (extras == null) {
+//                                W = new AToZList("W", getTopics(firstLetter));
+//                            } else {
+//                                W = new AToZList("W", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "X":
+//                        if(X == null) {
+//                            if (extras == null) {
+//                                X = new AToZList("X", getTopics(firstLetter));
+//                            } else {
+//                                X = new AToZList("X", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "Y":
+//                        if(Y == null) {
+//                            if (extras == null) {
+//                                Y = new AToZList("Y", getTopics(firstLetter));
+//                            } else {
+//                                Y = new AToZList("Y", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//                    case "Z":
+//                        if(Z == null) {
+//                            if (extras == null) {
+//                                Z = new AToZList("Z", getTopics(firstLetter));
+//                            } else {
+//                                Z = new AToZList("Z", addAuthors(firstLetter));
+//                            }
+//                        }
+//                        break;
+//
+//                }
+//            }
+//        }finally {
+//            Log.v(LOG_TAG, "I got to the finally block!");
+//            aToZ = Arrays.asList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
+//
+//            //TODO convert this to a mutable list to remove nulls
+//
+//            clone = new ArrayList<AToZList>();
+//            clone.addAll(aToZ);
+//            clone.removeAll(Collections.<AToZList>singleton(null));
+//
+//        }
+//
+//        parentTopicCursor.close();
+//        return clone;
+//        }
 
 
 
 
-    private ArrayList<Topic> getTopics(String firstLetter) {
+    private ArrayList<Topic> getTopics(Cursor childTopicCursor, String firstLetter) {
 
-        String[] projection = new String[]{
-                ExternalDbContract.QuoteEntry.TOPIC};
-        Cursor topicCursor = getContext().getContentResolver()
-                .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
-                        projection,
-                        null,
-                        null,
-                        null);
+
+
+//        String[] projection = new String[]{
+//                ExternalDbContract.QuoteEntry.TOPIC};
+//        Cursor childTopicCursor = getContext().getContentResolver()
+//                .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+//                        projection,
+//                        null,
+//                        null,
+//                        null);
+
+//        Bundle args = new Bundle();
+//        args.putString("uri", ExternalDbContract.QuoteEntry.CONTENT_URI.toString());
+//        getLoaderManager().initLoader(CHILD_LOADER, args, null);
 
         ArrayList<Topic> topicsByLetter = new ArrayList<Topic>();
         LinkedHashSet<Topic> tempTopicsByLetter = new LinkedHashSet<Topic>();
 
-        if (topicCursor != null) {
-            for (topicCursor.moveToFirst(); !topicCursor.isAfterLast(); topicCursor.moveToNext()) {
-                if (topicCursor.getString(0).toUpperCase().substring(0, 1).equals(firstLetter)) {
-                    topicsByLetter.add(new Topic(topicCursor.getString(0)));
+        if (childTopicCursor != null) {
+            for (childTopicCursor.moveToFirst(); !childTopicCursor.isAfterLast(); childTopicCursor.moveToNext()) {
+                if (childTopicCursor.getString(0).toUpperCase().substring(0, 1).equals(firstLetter)) {
+                    topicsByLetter.add(new Topic(childTopicCursor.getString(0)));
 //                        Log.v(LOG_TAG, "Duplicate check: " + topicsByLetter.get(0));
 
                 }
             }
-
 
             //Necessary to use a linkedhashset (see above) to not allow duplicate topics and also keep them alphabetical
             tempTopicsByLetter.addAll(topicsByLetter);
             topicsByLetter.clear();
             topicsByLetter.addAll(tempTopicsByLetter);
 
-            //To add a subtext preview below the letter to see topics without actually having to tap
-//        StringBuilder builder = new StringBuilder();
-//        for (Topic topic : topicsByLetter) {
-//            if(builder.length() != 0) {
-//                builder.append(", ");
-//            }
-//            builder.append(topic.getName());
-//        }
-
-
-//        mSubText.setText(builder.toString());
-
-            topicCursor.close();
+//            childTopicCursor.close();
         }
         return topicsByLetter;
     }
 
-    private ArrayList<Topic> addAuthors(String firstLetter) {
-        Cursor authorCursor = getContext().getContentResolver()
-                .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
-                        null,
-                        null,
-                        null,
-                        null);
+    private ArrayList<Topic> addAuthors(Cursor authorCursor, String firstLetter) {
+//        Cursor authorCursor = getContext().getContentResolver()
+//                .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
+//                        null,
+//                        null,
+//                        null,
+//                        null);
 
         ArrayList<Topic> authors = new ArrayList<Topic>();
         LinkedHashSet<Topic> tempAuthors = new LinkedHashSet<Topic>();
@@ -572,7 +956,7 @@ public class MainActivityFragment extends Fragment {
             authors.clear();
             authors.addAll(tempAuthors);
 
-            authorCursor.close();
+//            authorCursor.close();
         }
         return authors;
     }

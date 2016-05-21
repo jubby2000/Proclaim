@@ -108,9 +108,8 @@ public class FavoritesCardViewAdapter extends RecyclerView.Adapter<CardViewHolde
                                     R.color.gray), PorterDuff.Mode.SRC_ATOP);
 
                     values.put(ExternalDbContract.QuoteEntry.FAVORITE, "false");
-//                    db.update(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="
-//                            + quotes.get(holder.getAdapterPosition()).id, null);
 
+                    //Update data using AsyncTask and ContentProvider
                     UpdateDataTask updateTask =
                         new UpdateDataTask(mContext);
                     updateTask.execute(ExternalDbContract.QuoteEntry.TABLE_NAME, values, "_id="

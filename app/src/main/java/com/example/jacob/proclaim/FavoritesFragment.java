@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,14 +20,14 @@ import java.util.ArrayList;
 /**
  * Created by jacob on 4/11/16.
  */
-public class FavoritesFragment extends Fragment {
+public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     final String LOG_TAG = FavoritesFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
-//    private SQLiteDatabase database;
+    private static final int LOADER = 0;
     FavoritesCardViewAdapter mAdapter;
-    private ArrayList<Quote> quotes;
+    ArrayList<Quote> quotes;
     RecyclerView mRecyclerView;
 
     public FavoritesFragment() {
@@ -41,25 +44,16 @@ public class FavoritesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        Log.v(LOG_TAG, "made it to oncreate");
 
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-//        final List<Quote> quotes;
-//        ExternalDbOpenHelper dbOpenHelper = new ExternalDbOpenHelper(this.getContext());
-//        database = dbOpenHelper.openDataBase();
+        //Use a CursorLoader to query and set data on background thread
+        Bundle args = new Bundle();
+        args.putString("uri", ExternalDbContract.QuoteEntry.CONTENT_URI.toString());
+        getLoaderManager().initLoader(LOADER, args, this);
 
-        addQuotes();
-
-        mAdapter = new FavoritesCardViewAdapter(this.getContext(), quotes);
-//        DetailCardViewAdapter adapter = new DetailCardViewAdapter(quotes);
-
+        //Initialize RecyclerView to set data on later
         mRecyclerView = (RecyclerView) view.findViewById(R.id.quote_list);
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(mAdapter);
-
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         return view;
@@ -90,43 +84,37 @@ public class FavoritesFragment extends Fragment {
         mListener = null;
     }
 
-//    @Override
-//    public void onHiddenChanged(boolean hidden) {
-////        if (!hidden) {
-////            Log.v(LOG_TAG, "I'm at onHidden!");
-////            addQuotes();
-////
-////        }
-//        if (!hidden) {
-//
-//        }
-//    }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        Uri uri = Uri.parse(args.getString("uri"));
+
+        switch (id) {
+            case LOADER:
+                // Returns a new CursorLoader
+                return new CursorLoader(
+                        getActivity(),   // Parent activity context
+                        uri,        // Uri to query
+                        null,     // Projection to return (all columns)
+                        null,            // No selection clause
+                        null,            // No selection arguments
+                        null             // Default sort order
+                );
+            default:
+                // An invalid id was passed in
+                return null;
+        }
     }
 
-    private void addQuotes() {
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor quoteCursor) {
+
         quotes = new ArrayList<Quote>();
-//        Cursor quoteCursor = database.rawQuery("SELECT * FROM " + ExternalDbContract.QuoteEntry.TABLE_NAME, null);
-        Cursor quoteCursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
 
         if (quoteCursor != null) {
             quoteCursor.moveToFirst();
             if (!quoteCursor.isAfterLast()) {
                 do {
-//                long id = quoteCursor.getLong(quoteCursor.getColumnIndex(ExternalDbContract.QuoteEntry.QUOTE_ID));
                     long id = quoteCursor.getLong(0);
                     Log.v(LOG_TAG, String.valueOf(quoteCursor.getInt(0)) + " " + quoteCursor.getString(1));
                     String firstName = quoteCursor.getString(1);
@@ -154,20 +142,46 @@ public class FavoritesFragment extends Fragment {
                         quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
                     }
 
-//                if (getActivity().getIntent().getStringExtra("Topic") != null) {
-//                    Log.v(LOG_TAG, "From intent " + getActivity().getIntent().getStringExtra("Topic"));
-//                    if (getActivity().getIntent().getStringExtra("Topic").equals(topic)) {
-//                        quotes.add(new Quote(id, firstName, lastName, groupName, topic, quote, reference, date, favorite));
-//                    }
-//                }
-
 
                 } while (quoteCursor.moveToNext());
                 quoteCursor.close();
             }
+            mAdapter = new FavoritesCardViewAdapter(this.getContext(), quotes);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            mRecyclerView.setAdapter(mAdapter);
         }
-//        quoteCursor.close();
-//        database.close();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+////        if (!hidden) {
+////            Log.v(LOG_TAG, "I'm at onHidden!");
+////            addQuotes();
+////
+////        }
+//        if (!hidden) {
+//
+//        }
+//    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 
     public void scrollToTop() {

@@ -114,7 +114,16 @@ public class ExternalDbOpenHelper extends SQLiteOpenHelper {
         super.close();
     }
     @Override
-    public void onCreate(SQLiteDatabase db) {}
+    public void onCreate(SQLiteDatabase db) {
+//        createDataBase();
+    }
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if(newVersion>oldVersion)
+            try {
+                copyDataBase();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
 }

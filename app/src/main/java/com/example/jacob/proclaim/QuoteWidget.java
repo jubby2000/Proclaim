@@ -15,7 +15,7 @@ public class QuoteWidget extends AppWidgetProvider {
     private static final String LOG_TAG = QuoteWidget.class.getSimpleName();
 
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                       int appWidgetId) {
 
 //                context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
@@ -54,4 +54,5 @@ public class QuoteWidget extends AppWidgetProvider {
         // Enter relevant functionality for when the last widget is disabled
     }
 }
+
 

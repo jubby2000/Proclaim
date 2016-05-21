@@ -21,4 +21,5 @@ public class QuoteWidgetService extends RemoteViewsService
         return (new QuoteWidgetRemoteViewsFactory(this.getApplicationContext(), intent));
     }
 
+
 }

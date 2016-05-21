@@ -3,29 +3,27 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:orientation="vertical"
+    android:padding="@dimen/widget_text_padding"
     android:textColor="#ffffff"
     >
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="4dp"
-        android:minHeight="24dp"
-        android:layout_weight="1">
+        android:layout_height="48dp"
+        android:padding="4dp">
 
         <TextView
             android:id="@+id/appwidget_title"
             android:layout_weight="5"
-            android:layout_gravity="start|center_vertical"
+            android:layout_gravity="start|center"
             android:text="@string/appwidget_title"
             android:textColor="#ffffff"
             android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/widget_title_text_size"
-            android:padding="@dimen/widget_text_padding"
             android:layout_width="0dp"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:textStyle="bold"/>
 
         <ImageButton
@@ -44,8 +42,7 @@
         android:id="@+id/appwidget_listview"
         android:padding="@dimen/widget_margin"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3">
+        android:layout_height="wrap_content">
     </ListView>
 
     <!--<TextView-->
