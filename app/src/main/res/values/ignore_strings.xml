@@ -2,4 +2,5 @@
 <resources>
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="device_id">43575C1D0217B107EBB7B23098A32AF5</string>
+    <string name="keystore_password"></string>
 </resources>
