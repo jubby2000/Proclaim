@@ -20,7 +20,7 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="appwidget_title">Quote of the Day</string>
     <string name="add_widget">Add widget</string>
-    <string name="title_activity_detail2">DetailActivity2</string>
+    <string name="refresh_button_description">Refresh</string>
 
     <string name="invitation_title">This is my app.</string>
     <string name="invitation_message">You should get it.</string>

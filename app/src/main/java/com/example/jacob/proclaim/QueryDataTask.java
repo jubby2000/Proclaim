@@ -1,5 +1,6 @@
 package com.example.jacob.proclaim;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,9 +12,12 @@ import android.os.AsyncTask;
 public class QueryDataTask extends AsyncTask<Object, Void, Cursor> {
 
     Context mContext;
+    public ProgressDialog progress;
 
-    public QueryDataTask(Context context) {
+    public QueryDataTask(Context context, ProgressDialog progress) {
         this.mContext = context;
+        this.progress = progress;
+        this.progress.setMessage("Getting you that sweet data...");
     }
 
 //    private final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
@@ -23,6 +27,14 @@ public class QueryDataTask extends AsyncTask<Object, Void, Cursor> {
 //        this.dialog.setMessage("Inserting data...");
 //        this.dialog.show();
 //    }
+
+
+//    int result=-1;
+//    String Data;
+
+    public void onPreExecute() {
+        progress.show();
+    }
 
     @Override
     protected Cursor doInBackground(Object[] params) {
@@ -50,6 +62,7 @@ public class QueryDataTask extends AsyncTask<Object, Void, Cursor> {
         Cursor cursor = db.rawQuery(query, args);
         cursor.close();
 
+        progress.dismiss();
         return cursor;
     }
 }

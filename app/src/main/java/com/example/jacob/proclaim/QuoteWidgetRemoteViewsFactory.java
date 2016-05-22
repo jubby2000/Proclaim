@@ -1,6 +1,7 @@
 package com.example.jacob.proclaim;
 
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -56,6 +57,9 @@ public class QuoteWidgetRemoteViewsFactory implements RemoteViewsService.RemoteV
         mCursorLoader.registerListener(LOADER, this);
         mCursorLoader.startLoading();
 
+//        WidgetListItem listItem = new WidgetListItem();
+//        listItem.content = "So I guess this is how it's done.";
+//        widgetList.add(listItem);
     }
 
     public void populateListItem(Cursor cursor) {
@@ -212,6 +216,11 @@ public class QuoteWidgetRemoteViewsFactory implements RemoteViewsService.RemoteV
     public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "Cursor loader complete.");
         populateListItem(data);
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(
+                new ComponentName(context, QuoteWidget.class));
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.appwidget_listview);
     }
 
 //    @Override

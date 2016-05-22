@@ -28,9 +28,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
 
-    private static final int PARENT_LOADER = 0;
-    private static final int CHILD_LOADER = 1;
-    private static final int AUTHOR_LOADER = 2;
+    private static final int LOADER = 0;
 
     AToZAdapter mAdapter;
 
@@ -75,7 +73,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         Bundle args = new Bundle();
         args.putString("uri", ExternalDbContract.QuoteEntry.CONTENT_URI.toString());
-        getLoaderManager().initLoader(PARENT_LOADER, args, this);
+        getLoaderManager().initLoader(LOADER, args, this);
 
         return view;
     }
@@ -120,8 +118,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         Uri uri = Uri.parse(args.getString("uri"));
 
+        ExternalDbOpenHelper dbOpenHelper = new ExternalDbOpenHelper(getContext());
+        dbOpenHelper.createDataBase();
+
         switch (id) {
-            case PARENT_LOADER:
+            case LOADER:
                 if(extras == null) {
                 // Returns a new CursorLoader
                     return new CursorLoader(
@@ -142,24 +143,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             null             // Default sort order
                     );
                 }
-            case CHILD_LOADER:
-                return new CursorLoader(
-                        getActivity(),
-                        uri,
-                        null,
-                        null,
-                        null,
-                        null
-                );
-            case AUTHOR_LOADER:
-                return new CursorLoader(
-                        getActivity(),
-                        uri,
-                        null,
-                        null,
-                        null,
-                        null
-                );
 
             default:
                 // An invalid id was passed in
@@ -171,28 +154,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
         switch (loader.getId()) {
-            case PARENT_LOADER:
+            case LOADER:
                 topics = new ArrayList<Topic>();
                 List<AToZList> aToZ;
                 final ArrayList<AToZList> clone;
-                Cursor dupCursor;
+//                Cursor cursor;
                 AToZList A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
                 A=B=C=D=E=F=G=H=I=J=K=L=M=N=O=P=Q=R=S=T=U=V=W=X=Y=Z = null;
-
-//                if (extras != null) {
-//                    cursor = getContext().getContentResolver().query(ExternalDbContract.QuoteEntry.CONTENT_URI, null, null, null, null);
-                dupCursor = cursor;
-//                } else {
-//                    String[] projection = new String[]{
-//                            ExternalDbContract.QuoteEntry.TOPIC};
-//                    cursor = getContext().getContentResolver()
-//                            .query(ExternalDbContract.QuoteEntry.CONTENT_URI,
-//                                    projection,
-//                                    null,
-//                                    null,
-//                                    null);
-//                    dupCursor = cursor;
-//                }
 
                 String firstLetter = "";
 
@@ -221,10 +189,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "A":
                                 if(A == null) {
                                     if (extras == null) {
-                                        A = new AToZList("A", getTopics(dupCursor, firstLetter));
+                                        A = new AToZList("A", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        A = new AToZList("A", addAuthors(dupCursor, firstLetter));
+                                        A = new AToZList("A", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
 
@@ -235,10 +203,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "B":
                                 if(B == null) {
                                     if (extras == null) {
-                                        B = new AToZList("B", getTopics(dupCursor, firstLetter));
+                                        B = new AToZList("B", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        B = new AToZList("B", addAuthors(dupCursor, firstLetter));
+                                        B = new AToZList("B", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                     //aToZ.add(B);
@@ -247,10 +215,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "C":
                                 if(C == null) {
                                     if (extras == null) {
-                                        C = new AToZList("C", getTopics(dupCursor, firstLetter));
+                                        C = new AToZList("C", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        C = new AToZList("C", addAuthors(dupCursor, firstLetter));
+                                        C = new AToZList("C", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -258,10 +226,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "D":
                                 if(D == null) {
                                     if (extras == null) {
-                                        D = new AToZList("D", getTopics(dupCursor, firstLetter));
+                                        D = new AToZList("D", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        D = new AToZList("D", addAuthors(dupCursor, firstLetter));
+                                        D = new AToZList("D", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -269,10 +237,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "E":
                                 if(E == null) {
                                     if (extras == null) {
-                                        E = new AToZList("E", getTopics(dupCursor, firstLetter));
+                                        E = new AToZList("E", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        E = new AToZList("E", addAuthors(dupCursor, firstLetter));
+                                        E = new AToZList("E", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -280,10 +248,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "F":
                                 if(F == null) {
                                     if (extras == null) {
-                                        F = new AToZList("F", getTopics(dupCursor, firstLetter));
+                                        F = new AToZList("F", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        F = new AToZList("F", addAuthors(dupCursor, firstLetter));
+                                        F = new AToZList("F", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -291,10 +259,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "G":
                                 if(G == null) {
                                     if (extras == null) {
-                                        G = new AToZList("G", getTopics(dupCursor, firstLetter));
+                                        G = new AToZList("G", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        G = new AToZList("G", addAuthors(dupCursor, firstLetter));
+                                        G = new AToZList("G", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -302,10 +270,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "H":
                                 if(H == null) {
                                     if (extras == null) {
-                                        H = new AToZList("H", getTopics(dupCursor, firstLetter));
+                                        H = new AToZList("H", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        H = new AToZList("H", addAuthors(dupCursor, firstLetter));
+                                        H = new AToZList("H", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -313,10 +281,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "I":
                                 if(I == null) {
                                     if (extras == null) {
-                                        I = new AToZList("I", getTopics(dupCursor, firstLetter));
+                                        I = new AToZList("I", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        I = new AToZList("I", addAuthors(dupCursor, firstLetter));
+                                        I = new AToZList("I", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -324,10 +292,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "J":
                                 if(J == null) {
                                     if (extras == null) {
-                                        J = new AToZList("J", getTopics(dupCursor, firstLetter));
+                                        J = new AToZList("J", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        J = new AToZList("J", addAuthors(dupCursor, firstLetter));
+                                        J = new AToZList("J", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -335,10 +303,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "K":
                                 if(K == null) {
                                     if (extras == null) {
-                                        K = new AToZList("K", getTopics(dupCursor, firstLetter));
+                                        K = new AToZList("K", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        K = new AToZList("K", addAuthors(dupCursor, firstLetter));
+                                        K = new AToZList("K", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -346,10 +314,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "L":
                                 if(L == null) {
                                     if (extras == null) {
-                                        L = new AToZList("L", getTopics(dupCursor, firstLetter));
+                                        L = new AToZList("L", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        L = new AToZList("L", addAuthors(dupCursor, firstLetter));
+                                        L = new AToZList("L", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -357,10 +325,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "M":
                                 if(M == null) {
                                     if (extras == null) {
-                                        M = new AToZList("M", getTopics(dupCursor, firstLetter));
+                                        M = new AToZList("M", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        M = new AToZList("M", addAuthors(dupCursor, firstLetter));
+                                        M = new AToZList("M", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -368,10 +336,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "N":
                                 if(N == null) {
                                     if (extras == null) {
-                                        N = new AToZList("N", getTopics(dupCursor, firstLetter));
+                                        N = new AToZList("N", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        N = new AToZList("N", addAuthors(dupCursor, firstLetter));
+                                        N = new AToZList("N", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -379,10 +347,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "O":
                                 if(O == null) {
                                     if (extras == null) {
-                                        O = new AToZList("O", getTopics(dupCursor, firstLetter));
+                                        O = new AToZList("O", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        O = new AToZList("O", addAuthors(dupCursor, firstLetter));
+                                        O = new AToZList("O", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -390,10 +358,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "P":
                                 if(P == null) {
                                     if (extras == null) {
-                                        P = new AToZList("P", getTopics(dupCursor, firstLetter));
+                                        P = new AToZList("P", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        P = new AToZList("P", addAuthors(dupCursor, firstLetter));
+                                        P = new AToZList("P", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -401,10 +369,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "Q":
                                 if(Q == null) {
                                     if (extras == null) {
-                                        Q = new AToZList("Q", getTopics(dupCursor, firstLetter));
+                                        Q = new AToZList("Q", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        Q = new AToZList("Q", addAuthors(dupCursor, firstLetter));
+                                        Q = new AToZList("Q", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -412,10 +380,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "R":
                                 if(R == null) {
                                     if (extras == null) {
-                                        R = new AToZList("R", getTopics(dupCursor, firstLetter));
+                                        R = new AToZList("R", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        R = new AToZList("R", addAuthors(dupCursor, firstLetter));
+                                        R = new AToZList("R", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -423,10 +391,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "S":
                                 if(S == null) {
                                     if (extras == null) {
-                                        S = new AToZList("S", getTopics(dupCursor, firstLetter));
+                                        S = new AToZList("S", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        S = new AToZList("S", addAuthors(dupCursor, firstLetter));
+                                        S = new AToZList("S", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -434,10 +402,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "T":
                                 if(T == null) {
                                     if (extras == null) {
-                                        T = new AToZList("T", getTopics(dupCursor, firstLetter));
+                                        T = new AToZList("T", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        T = new AToZList("T", addAuthors(dupCursor, firstLetter));
+                                        T = new AToZList("T", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -445,10 +413,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "U":
                                 if(U == null) {
                                     if (extras == null) {
-                                        U = new AToZList("U", getTopics(dupCursor, firstLetter));
+                                        U = new AToZList("U", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        U = new AToZList("U", addAuthors(dupCursor, firstLetter));
+                                        U = new AToZList("U", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -456,10 +424,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "V":
                                 if(V == null) {
                                     if (extras == null) {
-                                        V = new AToZList("V", getTopics(dupCursor, firstLetter));
+                                        V = new AToZList("V", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        V = new AToZList("V", addAuthors(dupCursor, firstLetter));
+                                        V = new AToZList("V", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -467,10 +435,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "W":
                                 if(W == null) {
                                     if (extras == null) {
-                                        W = new AToZList("W", getTopics(dupCursor, firstLetter));
+                                        W = new AToZList("W", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        W = new AToZList("W", addAuthors(dupCursor, firstLetter));
+                                        W = new AToZList("W", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -478,10 +446,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "X":
                                 if(X == null) {
                                     if (extras == null) {
-                                        X = new AToZList("X", getTopics(dupCursor, firstLetter));
+                                        X = new AToZList("X", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        X = new AToZList("X", addAuthors(dupCursor, firstLetter));
+                                        X = new AToZList("X", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -489,10 +457,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "Y":
                                 if(Y == null) {
                                     if (extras == null) {
-                                        Y = new AToZList("Y", getTopics(dupCursor, firstLetter));
+                                        Y = new AToZList("Y", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        Y = new AToZList("Y", addAuthors(dupCursor, firstLetter));
+                                        Y = new AToZList("Y", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -500,10 +468,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             case "Z":
                                 if(Z == null) {
                                     if (extras == null) {
-                                        Z = new AToZList("Z", getTopics(dupCursor, firstLetter));
+                                        Z = new AToZList("Z", getTopics(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     } else {
-                                        Z = new AToZList("Z", addAuthors(dupCursor, firstLetter));
+                                        Z = new AToZList("Z", addAuthors(cursor, firstLetter));
                                         cursor.moveToPosition(currentPosition);
                                     }
                                 }
@@ -544,9 +512,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 mRecyclerView.setAdapter(mAdapter);
-
-            case CHILD_LOADER:
-
         }
 
 
